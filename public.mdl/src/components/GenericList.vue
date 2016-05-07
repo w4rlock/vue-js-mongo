@@ -42,7 +42,7 @@ export default {
         setTimeout(() => {
           componentHandler.upgradeAllRegistered()
           this.loading = false;
-        }, 500);
+        }, 100);
 
       });
     },
@@ -78,7 +78,17 @@ export default {
       setTimeout(() => { this.search(); }, 300);
     },
   
+    checkColor(index){
+      if (index > 0){
+        //$index-1 ya que no tengo el attrib _id
+        let attr = this.gridHeads[index-1];
+        return (attr && attr.type == "Color");
+      }
+      return false;
+    },
+
     checkImage(val){
+      if (!val) return false;
       return val.match(/(.png|.jpg|.gif|jpeg|.svg)/i);
     }
   }
@@ -116,9 +126,6 @@ table
 h3.info
   text-align center
 
-.ico
-  width 70px
-  height 80px
 </style>
 
 
@@ -157,9 +164,12 @@ h3.info
             td
               label.mdl-checkbox.mdl-js-checkbox.mdl-js-ripple-effect(for='lapp_chk-{{$index}}')
                 input.mdl-checkbox__input(id='lapp_chk-{{$index}}',type='checkbox',v-model='checks',value='{{ $index }}')
+
             td.mdl-data-table__cell--non-numeric(v-for='val in row')
-              img.ico(v-if='checkImage(val)', v-bind:src='val')
-              span(v-else){{ val }}
+              .color(v-if='checkColor(this.$index)', v-bind:style="{ background: val }")
+              div(v-else)
+                img.ico(v-if='checkImage(val)', v-bind:src='val')
+                span(v-else){{ val }}
 
     .mdl-cell.mdl-cell--12-col(v-else)
       h3.info Not Data Found

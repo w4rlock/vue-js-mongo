@@ -34,9 +34,7 @@ export default {
 		clickSave(){
       this.error = null;
       StoreCol.addDocument(this.base.collection, this.model)
-							.then(resp => {
-				this.clickCancel();
-			});
+              .then(this.clickCancel);
 		},
 
 
@@ -55,6 +53,11 @@ export default {
         });
       }
     },
+
+    isImage(val){
+      if (!val) return false;
+      return val.match(/(.png|.jpg|.gif|jpeg|.svg)/i);
+    }
 	}
 
 
@@ -78,11 +81,14 @@ export default {
           h4.err(v-show='error') {{ error }}
           h4(v-if='model._id') {{ base.collection }}: {{ model._id }}
           h4(v-else) New {{ base.collection }}
+
           .frmDoc
-            mdl-textfield(floating-label, v-for='k in keys',
-              :type.sync='k.type'
-              :label.sync='k.name',
-              :value.sync='model[k.name]')
+            div(v-for='k in keys')
+              img.ico(v-if='isImage(model[k.name])', v-bind:src='model[k.name]')
+              mdl-textfield(floating-label, 
+                :type.sync='k.type'
+                :label.sync='k.name',
+                :value.sync='model[k.name]')
 </template>
 
 <style lang='stylus'>
@@ -107,4 +113,7 @@ export default {
   .mdl-textfield
     display block
 
+.color
+  width 40px
+  height 30px
 </style>

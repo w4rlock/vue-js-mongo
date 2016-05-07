@@ -42,6 +42,7 @@ export default {
       this.model = { collection:'', attrs: [ this.newEmptyModel() ]};
       this.error = null;
 			this.validForm = false;
+      this.loading = false;
     },
     
     open(bmodel){
@@ -59,9 +60,11 @@ export default {
       this.showTypes = true;
     },
 
-    clickCancel(){
-      this.setDefaults();
-      this.$dispatch('clickcancel');
+    close(name_event){
+      return () => {
+        this.setDefaults();
+        this.$dispatch(name_event);
+      };
     },
 
     newEmptyModel(){
@@ -74,31 +77,30 @@ export default {
 
     clickRemove(index){
       this.model.attrs.splice(index, 1);
-    
     },
 
 
-		validate(){
-			if (!this.model.collection){
-				return false;
-			}
+    validate(){
+      if (!this.model.collection){
+        return false;
+      }
 
-			let i=0;
-			while(this.model.attrs[i]){
-				if (!this.model.attrs[i].name){
-					return false;
-				}
-				i++;
-			}
+      let i=0;
+      while(this.model.attrs[i]){
+        if (!this.model.attrs[i].name){
+          return false;
+        }
+        i++;
+      }
 
-			return true;
-		},
+      return true;
+    },
 
     clickErase(){
       this.loading = true;
       StoreCol.remove(this.model.collection)
       .then(r => StoreCol.removeDocument('model', this.model._id))
-      .then(this.closeDelay);
+      .then(this.close('clickerase'));
     },
 
     clickSave(){
@@ -109,11 +111,13 @@ export default {
       this.loading = true;
 
       if (this.model._id){
-        StoreCol.updateDocument('model', this.model).then(this.closeDelay);
+        StoreCol.updateDocument('model', this.model)
+                .then(this.close('clickcancel'));
       }
       else{
         StoreCol.create(this.model.collection).then(dat => {
-          StoreCol.addDocument('model',this.model).then(this.closeDelay);
+          StoreCol.addDocument('model',this.model)
+                  .then(this.close('clickadded'));
         });
       }
     },
@@ -122,6 +126,13 @@ export default {
       setTimeout(() => {
         this.loading = false;
         this.clickCancel();
+      }, 400);
+    },
+
+    eraseDelay(){
+      setTimeout(() => {
+        this.loading = false;
+        this.closeByErase();
       }, 400);
     },
 
@@ -141,7 +152,7 @@ export default {
       .mdl-grid
         .mdl-cell.mdl-cell--2-col
         .mdl-cell.mdl-cell--7-col
-          mdl-button(@click='clickCancel', v-mdl-ripple-effect, raised, primary)
+          mdl-button(@click='close("clickcancel")()', v-mdl-ripple-effect, raised, primary)
             i.material-icons keyboard_arrow_left
 
           mdl-button(@click='clickSave', v-mdl-ripple-effect, raised, primary)

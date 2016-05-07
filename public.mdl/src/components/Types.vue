@@ -10,6 +10,7 @@ export default {
       this.error = null;
       this.$dispatch('clickcancel');
     },
+
     clickSelect(index, isPrimate){
       setTimeout(() => {
         this.$dispatch('select', this.primateTypes[index], isPrimate);
@@ -23,13 +24,13 @@ export default {
     return {
       error: null,
       primateTypes: [
-        'Id'
-      , 'Boolean'
+        'Boolean'
       , 'Number'
       , 'String'
       , 'Date'
       , 'Url'
       , 'Email'
+      , 'Color'
       ]
     }
   }
@@ -57,11 +58,9 @@ export default {
       .mdl-cell.mdl-cell--12-col
         mdl-button(@click='clickCancel', v-mdl-ripple-effect, raised, primary) 
           i.material-icons keyboard_arrow_left
-        h4.title Primitives
+        h4.title Field Type:
         .separator
         ol.demo-list-item.mdl-list
           li.mdl-list__item(v-for='t in primateTypes')
             mdl-button(@click='clickSelect(this.$index, true)', v-mdl-ripple-effect, raised) {{ t }}
-        h4.title Complex
-        .separator
 </template>

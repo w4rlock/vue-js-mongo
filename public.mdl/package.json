@@ -5,7 +5,8 @@
   "author": "emanuel <emanuel@rockboxstudios.com>",
   "private": true,
   "scripts": {
-    "dev": "node build/dev-server.js",
+    "start": "PORT=3000 node build/dev-server.js",
+    "dev": "PORT=3000 node build/dev-server.js",
     "build": "node build/build.js",
     "unit": "karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",

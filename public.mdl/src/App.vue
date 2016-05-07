@@ -29,6 +29,9 @@ export default {
 
 	methods: {
     loadData(){
+      this.showNewForm = false;
+      this.showFormCollection = false; 
+
       Db.getStats().then(res => {
         this.dbstats = res.data;
         this.dbstats.coll_list =
@@ -50,6 +53,7 @@ export default {
 
     clickcancel(){
       this.showNewForm = false;
+      this.showFormCollection = false; 
       this.$refs.list.clickRefresh()
     },
 
@@ -63,22 +67,14 @@ export default {
       this.$refs.formdocument.open(this.colSelected, m)
     },
 
-    clickNewCollection(){ this.showFormCollection = true; },
-
-    clickCloseCollection(){ 
-      this.showFormCollection = false; 
-      this.loadData();
-    },
-		
     clickeditmodel(){ 
       this.$refs.formcollection.open(this.colSelected);
       this.showFormCollection = true;
     },
 
     clickCollection(index){
-      let n = this.dbstats.coll_list[index];
       this.currentIndex = index;
-      this.colSelected = this.getModel(n);
+      this.colSelected = this.models[index];
 
       this.$refs.list.setModel(this.colSelected);
       this.$refs.list.search();
@@ -95,6 +91,10 @@ export default {
 <style lang="stylus">
 html
   height: 100%
+
+.ico
+  width 70px
+  height 80px
 
 .blur8
   filter: blur(8px);
@@ -154,11 +154,11 @@ html
     div(v-bind:class='{ blur8: showNewForm || showFormCollection }')
       .mdl-grid
         .mdl-cell.mdl-cell--12-col.top-bar
-          mdl-button(v-for='col in dbstats.coll_list',
+          mdl-button(v-for='m in models',
             v-bind:class="{ 'selectedBtn': this.$index == currentIndex }",
-            @click='clickCollection(this.$index)', v-mdl-ripple-effect) {{ col }}
+            @click='clickCollection(this.$index)', v-mdl-ripple-effect) {{ m.collection }}
 
-          mdl-button(@click='clickNewCollection()', v-mdl-ripple-effect)
+          mdl-button(@click='showFormCollection=true', v-mdl-ripple-effect)
             i.material-icons add
 
       .mdl-grid
@@ -177,6 +177,8 @@ html
       .modal
         form-collection(
           v-ref:FormCollection,
-          v-on:clickcancel='clickCloseCollection')
+          v-on:clickerase='loadData'
+          v-on:clickadded='loadData'
+          v-on:clickcancel='clickcancel')
 
 </template>

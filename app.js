@@ -45,7 +45,7 @@ handlebars = handlebars.create({
     }
 });
 
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public.old', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json({limit: '16mb'}));
 app.use(bodyParser.urlencoded({extended: false }));
@@ -56,7 +56,7 @@ app.use("/ace", express.static(path.join(__dirname, 'node_modules/ace-builds/src
 app.use("/font-awesome", express.static(path.join(__dirname, 'node_modules/font-awesome/')));
 app.use("/jquery", express.static(path.join(__dirname, 'node_modules/jquery/dist/')));
 app.use("/bootstrap", express.static(path.join(__dirname, 'node_modules/bootstrap/dist/')));
-app.use("/adm2", express.static(path.join(__dirname, 'public')));
+app.use("/adm2", express.static(path.join(__dirname, 'public.old')));
 app.use(express.static(path.join(__dirname, 'public.mdl')));
 
 // setup nconf to read in the file
