@@ -12,7 +12,8 @@
     "url": "https://github.com/mrvautin/adminmongo/issues"
   },
   "scripts": {
-    "start": "node app.js"
+    "dev": "nodemon app.js",
+    "start": "PORT=3002 forever app.js"
   },
   "keywords": [
     "mongodb",
