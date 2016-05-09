@@ -18,6 +18,7 @@ export default {
       gridKeys: [],
       gridRows: [],
       gridHeads: [],
+      notDataFound: false,
       data: {},
       checks: [],
       loading: false,
@@ -25,12 +26,12 @@ export default {
     };
   },
   methods: {
-		setModel(c){
+    setModel(c){
       this.bmodel = c;
       this.gridHeads = c.attrs;
-		},
+    },
 
-		// @param {Number} p is page number
+    // @param {Number} p is page number
     search(p = 1){
       this.checks = [];
       this.loading = true;
@@ -38,6 +39,7 @@ export default {
       Db.getDocuments(this.bmodel.collection, p).then(r => {
         this.data = r.data.data;
         this.gridRows = r.data.data.map(Object.values);
+        this.notDataFound = (this.gridRows.length == 0);
 
         setTimeout(() => {
           componentHandler.upgradeAllRegistered()
@@ -171,7 +173,7 @@ h3.info
                 img.ico(v-if='checkImage(val)', v-bind:src='val')
                 span(v-else){{ val }}
 
-    .mdl-cell.mdl-cell--12-col(v-else)
+    .mdl-cell.mdl-cell--12-col(v-if='notDataFound')
       h3.info Not Data Found
 
 </template>

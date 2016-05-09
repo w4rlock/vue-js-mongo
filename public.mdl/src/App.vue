@@ -6,28 +6,28 @@ import Db from './stores/Db'
 
 export default {
   components: {
-		list,
+    list,
     FormDocument,
     FormCollection
   },
 
-	created(){
+  created(){
     this.loadData();
-	},
+  },
 
-	data() {
-		return {
+  data() {
+    return {
       transition: 'fade',
-			showNewForm: false,
+      showNewForm: false,
       showFormCollection: false,
-			dbstats: {},
+      dbstats: {},
       models: [],
       colSelected: null,
       currentIndex: 0
-		}
-	},
+    }
+  },
 
-	methods: {
+  methods: {
     loadData(){
       this.showNewForm = false;
       this.showFormCollection = false; 
@@ -57,10 +57,10 @@ export default {
       this.$refs.list.clickRefresh()
     },
 
-		newDocument(){
+    newDocument(){
       this.$refs.formdocument.open(this.colSelected);
-			this.showNewForm = !this.showNewForm
-		},
+      this.showNewForm = !this.showNewForm
+    },
 
     clickopen(m){
       this.showNewForm = !this.showNewForm
@@ -84,7 +84,7 @@ export default {
       let m = this.models.filter(m => m.collection == name);
       return (m && m.length > 0) ? m[0] : null;
     }
-	}
+  }
 }
 </script>
 
@@ -164,10 +164,10 @@ html
       .mdl-grid
         .mdl-cell.mdl-cell--12-col
           list(
-            v-ref:list,
-            v-on:clicknew='newDocument', 
-            v-on:clickopen='clickopen'
-            v-on:clickeditmodel='clickeditmodel')
+            v-ref:list
+           , v-on:clicknew='newDocument'
+           , v-on:clickopen='clickopen'
+           , v-on:clickeditmodel='clickeditmodel')
 
     .center(v-show='showNewForm')
       .modal
@@ -176,9 +176,9 @@ html
     .center(v-show='showFormCollection')
       .modal
         form-collection(
-          v-ref:FormCollection,
-          v-on:clickerase='loadData'
-          v-on:clickadded='loadData'
-          v-on:clickcancel='clickcancel')
+            v-ref:FormCollection
+          , v-on:clickerase='loadData'
+          , v-on:clickadded='loadData'
+          , v-on:clickcancel='clickcancel')
 
 </template>
