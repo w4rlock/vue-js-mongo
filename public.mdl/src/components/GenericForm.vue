@@ -65,9 +65,9 @@ export default {
 </script>
 
 <template lang='jade'>
-  .overlay-wrap(v-show='loading')
-    Loader(:show='true')
   .mdl-card.mdl-shadow--4dp.full.mh500
+    .overlay-wrap(v-show='loading')
+      Loader(:show='true')
     .mdl-grid
       .mdl-cell.mdl-cell--12-col
         .mdl-cell.mdl-cell--12-col
@@ -94,14 +94,6 @@ export default {
 <style lang='stylus'>
 .mt50
   margin-top 50px
-
-.overlay-wrap
-  position absolute
-  z-index 113
-  width 70%
-  height 100%
-  @media(max-width: 730px)
-    width 95%
 
 .full
   width: 100%

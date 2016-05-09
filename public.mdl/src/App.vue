@@ -147,6 +147,27 @@ html
 
 .selectedBtn
   background-color: rgba(158,158,158,.2);
+
+.mdl-textfield.invalid .mdl-textfield__input 
+  border-color #d50000
+  box-shadow none
+
+.mdl-textfield--floating-label.invalid .mdl-textfield__label 
+  color: #d50000
+  font-size: 12px
+
+.mdl-textfield.invalid .mdl-textfield__label:after
+    background-color: #d50000;
+
+.overlay-wrap
+  position absolute
+  z-index 113
+  width 100%
+  bottom 32px
+  height 100%
+  @media(max-width: 730px)
+    width 95%
+
 </style>
 
 <template lang='jade'>

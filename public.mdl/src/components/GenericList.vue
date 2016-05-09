@@ -82,7 +82,7 @@ export default {
   
     checkColor(index){
       if (index > 0){
-        //$index-1 ya que no tengo el attrib _id
+        //$index-1 ya que no tengo el attrib _id en el modelo
         let attr = this.gridHeads[index-1];
         return (attr && attr.type == "Color");
       }

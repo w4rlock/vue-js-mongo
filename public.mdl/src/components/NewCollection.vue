@@ -19,7 +19,6 @@ export default {
       error: null,
       showTypes: false,
       index: 0,
-			validForm: false,
       model: {},
       primateTypes: [
         'id'
@@ -41,7 +40,6 @@ export default {
     setDefaults(){
       this.model = { collection:'', attrs: [ this.newEmptyModel() ]};
       this.error = null;
-			this.validForm = false;
       this.loading = false;
     },
     
@@ -73,6 +71,7 @@ export default {
 
     clickAddNew(){
       this.model.attrs.push(this.newEmptyModel());
+      this.upgradeComponents();
     },
 
     clickRemove(index){
@@ -80,46 +79,41 @@ export default {
     },
 
 
-    validate(){
-      if (!this.model.collection){
-        return false;
-      }
-
-      let i=0;
-      while(this.model.attrs[i]){
-        if (!this.model.attrs[i].name){
-          return false;
-        }
-        i++;
-      }
-
-      return true;
+    isValidForm(){
+      return (document.querySelector('.invalid') == null);
     },
 
     clickErase(){
       this.loading = true;
       StoreCol.remove(this.model.collection)
-      .then(r => StoreCol.removeDocument('model', this.model._id))
-      .then(this.close('clickerase'));
+              .then(r=>StoreCol.removeDocument('model', this.model._id))
+              .then(this.close('clickerase'))
+              .catch(this.showError);
     },
 
     clickSave(){
-			this.validForm = this.validate();
-			if (!this.validForm) return;
+			if (!this.isValidForm()){
+			 return;
+      }
 
       this.error = null;
       this.loading = true;
-
       if (this.model._id){
         StoreCol.updateDocument('model', this.model)
-                .then(this.close('clickcancel'));
+                .then(this.close('clickcancel'))
+                .catch(this.showError);
       }
       else{
-        StoreCol.create(this.model.collection).then(dat => {
-          StoreCol.addDocument('model',this.model)
-                  .then(this.close('clickadded'));
-        });
+        StoreCol.create(this.model.collection)
+                .then(r=> StoreCol.addDocument('model',this.model))
+                .then(this.close('clickadded'))
+                .catch(this.showError);
       }
+    },
+
+    showError(err){
+      this.loading = false;
+      this.error = err.data;
     },
 
     closeDelay(){
@@ -139,19 +133,24 @@ export default {
     open(document){
       this.model = document;
       this.entries = Object.entries(document);
+      this.upgradeComponents();
+    },
+
+    upgradeComponents(){
+      setTimeout(() => componentHandler.upgradeAllRegistered(), 200);
     }
   }
 }
 </script>
 
 <template lang='jade'>
-  .overlay-wrap(v-show='loading')
-    Loader(:show='true')
   .mdl-card.mdl-shadow--4dp.full.mh500
+    .overlay-wrap(v-show='loading')
+      Loader(:show='true')
     .container
       .mdl-grid
         .mdl-cell.mdl-cell--2-col
-        .mdl-cell.mdl-cell--7-col
+        .mdl-cell.mdl-cell--3-col.mdl-cell.mdl-cell--4-col-tablet
           mdl-button(@click='close("clickcancel")()', v-mdl-ripple-effect, raised, primary)
             i.material-icons keyboard_arrow_left
 
@@ -159,23 +158,29 @@ export default {
             i.material-icons cloud_upload
 
         .mdl-cell.mdl-cell--2-col
-          mdl-button(@click='clickErase', v-mdl-ripple-effect, raised)
+          mdl-button(v-if='model._id', @click='clickErase', v-mdl-ripple-effect, raised)
             i.material-icons delete_forever
 
     .mdl-grid
       h4.err(v-show='error') {{ error }}
       .mdl-cell.mdl-cell--12-col.mdl-cell--12-col-tablet
         h3(v-if='model._id') {{ model.collection }}
-        mdl-textfield.cName(v-else,
-          id='txtCName', floating-label, label='Collection Name', :value.sync='model.collection', 
-        )
+
+        #txtCName.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty(
+        v-else, v-bind:class="{ 'invalid': !model.collection }")
+          input.mdl-textfield__input(v-model='model.collection')
+          label.mdl-textfield__label Collection Name
 
         div(v-for='item in model.attrs')
           .rowInput
-                mdl-textfield(floating-label, label='Key Name', :value.sync='item.name')
-                mdl-button.btnType(@click='openType(this.$index)', v-mdl-ripple-effect) {{ item.type }}
-                mdl-button(@click='clickRemove(this.$index)', v-mdl-ripple-effect)
-                  i.material-icons delete
+            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty(v-bind:class="{ 'invalid': !item.name }")
+              input.mdl-textfield__input(v-model='item.name')
+              label.mdl-textfield__label Key Name
+
+
+            mdl-button.btnType(@click='openType(this.$index)', v-mdl-ripple-effect) {{ item.type }}
+            mdl-button(v-if="this.$index > 0", @click='clickRemove(this.$index)', v-mdl-ripple-effect)
+              i.material-icons delete
 
         mdl-button(@click='clickAddNew', v-mdl-ripple-effect, fab)
           i.material-icons add
@@ -186,14 +191,6 @@ export default {
 </template>
 
 <style lang='stylus'>
-.overlay-wrap
-  position absolute
-  z-index 113
-  width 70%
-  height 100%
-  @media(max-width: 730px)
-    width 95%
-
 .cName
   width 100%
   margin-bottom 30px
@@ -201,6 +198,7 @@ export default {
 .full
   top 32px
   width: 100%
+  margin-bottom 32px
 
 .rowInput
   display inline-block
@@ -209,7 +207,7 @@ export default {
   display inline-block
 
 .btnType
-  width 150px
+  width 120px
   text-align left
 
 .popup
