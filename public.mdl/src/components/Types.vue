@@ -1,8 +1,11 @@
 <script>
 export default {
   props: ['show'],
-  components: {
-    
+
+  events:{
+    onLoadModels(models){
+      this.collections = models;
+    }
   },
 
   methods: {
@@ -11,18 +14,15 @@ export default {
       this.$dispatch('clickcancel');
     },
 
-    clickSelect(index, isPrimate){
-      setTimeout(() => {
-        this.$dispatch('select', this.primateTypes[index], isPrimate);
-      }, 350);
-    
-      
+    clickSelect(name, isObject){
+      setTimeout(() => { this.$dispatch('select', name, isObject); }, 350); 
     }
   },
 
   data () {
     return {
       error: null,
+      collections: [],
       primateTypes: [
         'Boolean'
       , 'Number'
@@ -43,12 +43,18 @@ export default {
   padding: 0;
 	display: inline-block;
 }
+
 .separator{
   width: 100%;
   border-top: 1px solid gainsboro;
 }
+
 .title{
   margin-bottom: 7px;
+}
+
+.space50{
+  margin-top: 50px
 }
 </style>
 
@@ -58,9 +64,17 @@ export default {
       .mdl-cell.mdl-cell--12-col
         mdl-button(@click='clickCancel', v-mdl-ripple-effect, raised, primary) 
           i.material-icons keyboard_arrow_left
-        h4.title Field Type:
+        h4.title Data Type:
         .separator
         ol.demo-list-item.mdl-list
           li.mdl-list__item(v-for='t in primateTypes')
-            mdl-button(@click='clickSelect(this.$index, true)', v-mdl-ripple-effect, raised) {{ t }}
+            mdl-button(@click='clickSelect(t, false)', v-mdl-ripple-effect, raised) {{ t }}
+
+        .space50(v-show='collections.length > 0')
+          h4.title Relational Type:
+          .separator
+            ol.demo-list-item.mdl-list
+              li.mdl-list__item(v-for='t in collections')
+                mdl-button(@click='clickSelect(t.collection, true)', v-mdl-ripple-effect, raised) {{ t.collection }}
+        
 </template>

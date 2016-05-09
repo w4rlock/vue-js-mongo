@@ -48,8 +48,13 @@ export default {
     },
     
 
-    selectType(elem, isPrimate){
+    selectType(elem, isObject){
       this.model.attrs[this.index].type = elem;
+      this.model.attrs[this.index].isObject = isObject;
+      //name recommended for sub-objects
+      if (isObject){
+        this.model.attrs[this.index].name = elem;
+      }
       this.showTypes = false;
     },
 
@@ -66,7 +71,12 @@ export default {
     },
 
     newEmptyModel(){
-      return { name: '', type: 'String', required: false };
+      return { 
+          name: ''
+        , type: 'String'
+        , isObject: false
+        , required: false 
+      };
     },
 
     clickAddNew(){
@@ -166,14 +176,14 @@ export default {
       .mdl-cell.mdl-cell--12-col.mdl-cell--12-col-tablet
         h3(v-if='model._id') {{ model.collection }}
 
-        #txtCName.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty(
+        #txtCName.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty.is-focused(
         v-else, v-bind:class="{ 'invalid': !model.collection }")
           input.mdl-textfield__input(v-model='model.collection')
           label.mdl-textfield__label Collection Name
 
         div(v-for='item in model.attrs')
           .rowInput
-            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty(v-bind:class="{ 'invalid': !item.name }")
+            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty(v-bind:class="{ 'invalid': !item.name,'is-dirty': item.name }")
               input.mdl-textfield__input(v-model='item.name')
               label.mdl-textfield__label Key Name
 
@@ -187,7 +197,10 @@ export default {
 
     .mdl-grid
       .mdl-cell.mdl-cell--12-col.mdl-cell--12-col-tablet.black
-        Types.popup(v-on:clickcancel='showTypes=false', :show='showTypes', v-on:select='selectType')
+        Types.popup(
+          v-on:clickcancel='showTypes=false',   
+          :show='showTypes', 
+          v-on:select='selectType')
 </template>
 
 <style lang='stylus'>

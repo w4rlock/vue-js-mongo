@@ -27,6 +27,7 @@ export default {
     }
   },
 
+
   methods: {
     loadData(){
       this.showNewForm = false;
@@ -39,6 +40,7 @@ export default {
 
         Db.getModels().then(res => {
           this.models = res.data.data;
+          this.$broadcast('onLoadModels', this.models);
           this.clickCollection(0);
         });
 
@@ -54,6 +56,7 @@ export default {
     clickcancel(){
       this.showNewForm = false;
       this.showFormCollection = false; 
+      if (!this.colSelected) return;
       this.$refs.list.clickRefresh()
     },
 
@@ -75,7 +78,7 @@ export default {
     clickCollection(index){
       this.currentIndex = index;
       this.colSelected = this.models[index];
-
+      if (!this.colSelected) return;
       this.$refs.list.setModel(this.colSelected);
       this.$refs.list.search();
     },
@@ -175,9 +178,11 @@ html
     div(v-bind:class='{ blur8: showNewForm || showFormCollection }')
       .mdl-grid
         .mdl-cell.mdl-cell--12-col.top-bar
+
           mdl-button(v-for='m in models',
             v-bind:class="{ 'selectedBtn': this.$index == currentIndex }",
-            @click='clickCollection(this.$index)', v-mdl-ripple-effect) {{ m.collection }}
+            @click='clickCollection(this.$index)', 
+            v-mdl-ripple-effect) {{ m.collection }}
 
           mdl-button(@click='showFormCollection=true', v-mdl-ripple-effect)
             i.material-icons add
@@ -185,14 +190,15 @@ html
       .mdl-grid
         .mdl-cell.mdl-cell--12-col
           list(
-            v-ref:list
+             v-ref:list
            , v-on:clicknew='newDocument'
            , v-on:clickopen='clickopen'
            , v-on:clickeditmodel='clickeditmodel')
 
     .center(v-show='showNewForm')
       .modal
-        form-document(v-ref:FormDocument,v-on:clickcancel='clickcancel')
+        form-document(v-ref:FormDocument,
+          v-on:clickcancel='clickcancel')
 
     .center(v-show='showFormCollection')
       .modal
