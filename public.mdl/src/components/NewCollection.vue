@@ -1,35 +1,44 @@
 <script>
 import Loader from './Loader.vue'
 import Types from './Types.vue'
+import RowKeyType from './RowKeyType.vue'
 import StoreCol from '../stores/Collections'
+import { clone } from '../utils/Utils'
 
 export default {
   components: {
     Types,
-    Loader
+    Loader,
+    RowKeyType
   },
 
   created(){
     this.setDefaults();
   },
 
+
   data () {
     return {
-      loading: false,
-      error: null,
-      showTypes: false,
       index: 0,
       model: {},
+      error: null,
+      loading: false,
+      showTypes: false,
+      baseModel: {
+          name: ''
+        , type: 'String'
+        , isObject: false
+        , required: false 
+      },
       primateTypes: [
-        'id'
-      , 'Boolean'
-      , 'Number'
-      , 'String'
-      , 'Date'
-      , 'Url'
-      , 'Email'
-      ],
-      complexTypes: []
+          'id'
+        , 'Boolean'
+        , 'Number'
+        , 'String'
+        , 'Date'
+        , 'Url'
+        , 'Email'
+      ]
     }
   },
 
@@ -38,30 +47,36 @@ export default {
 	/*Form Events*/
   methods: {
     setDefaults(){
-      this.model = { collection:'', attrs: [ this.newEmptyModel() ]};
       this.error = null;
       this.loading = false;
+      this.model = { 
+          collection:'' 
+        , attrs: [ clone(this.baseModel) ]
+      }
     },
     
+    //edit mode
     open(bmodel){
       this.model = bmodel;
     },
-    
+
 
     selectType(elem, isObject){
-      this.model.attrs[this.index].type = elem;
-      this.model.attrs[this.index].isObject = isObject;
       //name recommended for sub-objects
       if (isObject){
         this.model.attrs[this.index].name = elem;
       }
+      this.model.attrs[this.index].type = elem;
+      this.model.attrs[this.index].isObject = isObject;
       this.showTypes = false;
     },
 
-    openType(index){
+
+    openType(index) {
       this.index = index;
       this.showTypes = true;
     },
+
 
     close(name_event){
       return () => {
@@ -70,40 +85,24 @@ export default {
       };
     },
 
-    newEmptyModel(){
-      return { 
-          name: ''
-        , type: 'String'
-        , isObject: false
-        , required: false 
-      };
-    },
-
-    clickAddNew(){
-      this.model.attrs.push(this.newEmptyModel());
-      this.upgradeComponents();
-    },
-
-    clickRemove(index){
-      this.model.attrs.splice(index, 1);
-    },
-
 
     isValidForm(){
       return (document.querySelector('.invalid') == null);
     },
 
+
     clickErase(){
       this.loading = true;
       StoreCol.remove(this.model.collection)
-              .then(r=>StoreCol.removeDocument('model', this.model._id))
+              .then(r => StoreCol.removeDocument('model', this.model._id))
               .then(this.close('clickerase'))
-              .catch(this.showError);
+              .catch(this.showErrorDB);
     },
+
 
     clickSave(){
 			if (!this.isValidForm()){
-			 return;
+        return;
       }
 
       this.error = null;
@@ -111,44 +110,28 @@ export default {
       if (this.model._id){
         StoreCol.updateDocument('model', this.model)
                 .then(this.close('clickcancel'))
-                .catch(this.showError);
+                .catch(this.showErrorDB);
       }
       else{
         StoreCol.create(this.model.collection)
                 .then(r=> StoreCol.addDocument('model',this.model))
                 .then(this.close('clickadded'))
-                .catch(this.showError);
+                .catch(this.showErrorDB);
       }
     },
 
-    showError(err){
+
+    showErrorDB(err){
       this.loading = false;
       this.error = err.data;
     },
 
-    closeDelay(){
-      setTimeout(() => {
-        this.loading = false;
-        this.clickCancel();
-      }, 400);
-    },
 
-    eraseDelay(){
-      setTimeout(() => {
-        this.loading = false;
-        this.closeByErase();
-      }, 400);
-    },
 
-    open(document){
-      this.model = document;
-      this.entries = Object.entries(document);
-      this.upgradeComponents();
+    open(mod){
+      this.model = mod;
+      this.entries = Object.entries(mod);
     },
-
-    upgradeComponents(){
-      setTimeout(() => componentHandler.upgradeAllRegistered(), 200);
-    }
   }
 }
 </script>
@@ -158,17 +141,16 @@ export default {
     .overlay-wrap(v-show='loading')
       Loader(:show='true')
     .container
-      .mdl-grid
-        .mdl-cell.mdl-cell--2-col
+      .mdl-grid.w100
         .mdl-cell.mdl-cell--3-col.mdl-cell.mdl-cell--4-col-tablet
           mdl-button(@click='close("clickcancel")()', v-mdl-ripple-effect, raised, primary)
             i.material-icons keyboard_arrow_left
 
+
+        .mdl-cell.mdl-cell--5-col.tac
           mdl-button(@click='clickSave', v-mdl-ripple-effect, raised, primary)
             i.material-icons cloud_upload
-
-        .mdl-cell.mdl-cell--2-col
-          mdl-button(v-if='model._id', @click='clickErase', v-mdl-ripple-effect, raised)
+          mdl-button(v-if='model._id', @click='clickErase', v-mdl-ripple-effect, raised, primary)
             i.material-icons delete_forever
 
     .mdl-grid
@@ -181,26 +163,19 @@ export default {
           input.mdl-textfield__input(v-model='model.collection')
           label.mdl-textfield__label Collection Name
 
-        div(v-for='item in model.attrs')
-          .rowInput
-            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty(v-bind:class="{ 'invalid': !item.name,'is-dirty': item.name }")
-              input.mdl-textfield__input(v-model='item.name')
-              label.mdl-textfield__label Key Name
-
-
-            mdl-button.btnType(@click='openType(this.$index)', v-mdl-ripple-effect) {{ item.type }}
-            mdl-button(v-if="this.$index > 0", @click='clickRemove(this.$index)', v-mdl-ripple-effect)
-              i.material-icons delete
-
-        mdl-button(@click='clickAddNew', v-mdl-ripple-effect, fab)
-          i.material-icons add
+        row-key-type(
+          :autoremove='true',
+          :attrs.sync='model.attrs', 
+          :basemodel='baseModel',
+          v-on:clicktype='openType')
 
     .mdl-grid
       .mdl-cell.mdl-cell--12-col.mdl-cell--12-col-tablet.black
         Types.popup(
-          v-on:clickcancel='showTypes=false',   
           :show='showTypes', 
+          v-on:clickcancel='showTypes=false',   
           v-on:select='selectType')
+
 </template>
 
 <style lang='stylus'>
@@ -212,9 +187,6 @@ export default {
   top 32px
   width: 100%
   margin-bottom 32px
-
-.rowInput
-  display inline-block
 
 .mdl-textfield
   display inline-block

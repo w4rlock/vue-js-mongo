@@ -60,10 +60,11 @@ export default {
 
 <template lang='jade'>
   .mdl-card.mdl-shadow--2dp.full(v-show='show')
-    .mdl-grid
-      .mdl-cell.mdl-cell--12-col
+    .mdl-grid.w100
+      .mdl-cell.mdl-cell--1-col
         mdl-button(@click='clickCancel', v-mdl-ripple-effect, raised, primary) 
           i.material-icons keyboard_arrow_left
+      .mdl-cell.mdl-cell--10-col.mt50
         h4.title Data Type:
         .separator
         ol.demo-list-item.mdl-list
@@ -76,5 +77,5 @@ export default {
             ol.demo-list-item.mdl-list
               li.mdl-list__item(v-for='t in collections')
                 mdl-button(@click='clickSelect(t.collection, true)', v-mdl-ripple-effect, raised) {{ t.collection }}
-        
+      
 </template>

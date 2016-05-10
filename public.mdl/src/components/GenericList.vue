@@ -8,9 +8,11 @@ export default {
     Loader
   },
 
+
   created(){
     this.loadData();
   },
+
 
   data () {
     return {
@@ -25,11 +27,14 @@ export default {
       bmodel: null
     };
   },
+
+
   methods: {
     setModel(c){
       this.bmodel = c;
       this.gridHeads = c.attrs;
     },
+
 
     // @param {Number} p is page number
     search(p = 1){
@@ -49,18 +54,22 @@ export default {
       });
     },
 
+
     hasChild(field){
       return ((typeof field != 'object')
            && (!Array.isArray(field)));
     },
 
+
     loadData(){
       this.checks = [];
     },
 
+
     clickRefresh(){
       this.search();
     },
+
 
     clickOpen(){
       let pos = this.checks[0];
@@ -68,9 +77,11 @@ export default {
       this.$dispatch('clickopen', w);
     },
 
+
     clickNew(){
       this.$dispatch('clicknew');
     },
+
 
     clickDelete(){
       this.checks.forEach((i) => {
@@ -79,6 +90,7 @@ export default {
       });
       setTimeout(() => { this.search(); }, 300);
     },
+
   
     checkColor(index){
       if (index > 0){
@@ -88,6 +100,7 @@ export default {
       }
       return false;
     },
+
 
     checkImage(val){
       if (!val) return false;
