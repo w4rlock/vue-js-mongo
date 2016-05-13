@@ -1,8 +1,14 @@
 <script>
 import Db from '../stores/Db'
+import Loader from './Loader.vue'
 import { isImage } from '../utils/Utils'
 
+
 export default{
+  components: {
+    Loader
+  },
+
   props:{
     heads: { type: Array, required: true },
     checks: { type: Array },
@@ -17,8 +23,9 @@ export default{
 
   watch: {
     entity(){
-			if (!this.entity) 
-				return
+      if (!this.entity) {
+        return;
+      }
       this.search();
     }
   },
@@ -38,11 +45,12 @@ export default{
 
     reset(){
       this.heads = [];
-			this.checks= [];
+      this.checks= [];
       this.$data = this.defaults();
     },
 
     search(){
+			this.loading = true;
       Db.getDocuments(this.entity).then(r => {
         this.result = r.data.data;
         this.rows = this.result.map(this.mapRow);
@@ -71,6 +79,7 @@ export default{
 </script>
 
 <template lang='jade'>
+Loader(:show='loading', :type='"spinner"')
 table.mdl-data-table.mdl-js-data-table.ml-table-striped.mdl-shadow--1dp(v-show='show')
   thead
     tr

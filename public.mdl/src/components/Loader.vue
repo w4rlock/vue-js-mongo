@@ -1,12 +1,15 @@
 <template lang='jade'>
-	.overlay-spinner.center-all(v-show='show')
-		.mdl-progress.mdl-js-progress.mdl-progress__indeterminate
+.overlay-spinner.center-all(v-show='show')
+  .mdl-spinner.mdl-spinner--single-color.mdl-js-spinner.is-active(v-if="type == 'spinner'")
+  .mdl-progress.mdl-js-progress.mdl-progress__indeterminate(v-else)
 </template>
 
 <script>
 export default{
-	props: ['show'],
-
+	props: {
+    show: Boolean,
+    type: String
+  }
 }
 </script>
 
@@ -24,5 +27,7 @@ export default{
 display: flex;
 justify-content: center;
 align-items: center;
+top: 0;
+left: 0;
 }
 </style>

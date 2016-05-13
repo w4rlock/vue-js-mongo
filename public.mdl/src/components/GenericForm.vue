@@ -113,8 +113,8 @@ export default {
     .mdl-grid.w100
       .mdl-cell.mdl-cell--11-col.mdl-cell--11-col-tablet.ml50
         .mdl-tabs.mdl-js-tabs.mdl-js-ripple-effect
-          tab-bar(v-ref:tabbar, :names.sync='tabs', v-on:clicktab='clickTab')
-          .mdl-tabs__panel.mt50(:id='"panel-"+base.collection', :class='{ "is-active": this.$refs.tabbar.selectedTab == 0 }') 
+          tab-bar(v-ref:tabbar, :names.sync='tabs', v-on:clicktab='clickTab', :cclass='"greyBar"')
+          .mdl-tabs__panel.mt90(:id='"panel-"+base.collection', :class='{ "is-active": this.$refs.tabbar.selectedTab == 0 }') 
             h4.err(v-show='error') {{ error }}
             h5(v-if='model._id') {{ base.collection }}: {{ model._id }}
             h5(v-else) New {{ base.collection }}
@@ -127,7 +127,7 @@ export default {
                   :label.sync='k.name',
                   :value.sync='model[k.name]')
 
-          .mdl-tabs__panel.mt50.is-active
+          .mdl-tabs__panel.is-active.absolute
             data-grid(v-ref:datagrid,:heads.sync='selectedrel.keys', 
             :checks='model[selectedrel.name] || []', :entity='selectedrel.entity', :showidcol='false')
       .mdl-cell.mdl-cell--1-col.mdl-cell--1-col-tablet.ml50
@@ -135,8 +135,27 @@ export default {
 </template>
 
 <style lang='stylus'>
+.mt90
+  margin-top 90px
+
 .mt50
   margin-top 50px
+
+.greyBar
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  top: 85px;
+  background: #F3F3F3;
+  border-top: 1px solid #e0e0e0;
+
+.absolute
+  width 100%
+  position absolute
+  left 0
+  right 0
+  top 150px
 
 .ml50
   margin-left 50px

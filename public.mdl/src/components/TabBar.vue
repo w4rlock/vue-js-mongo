@@ -1,5 +1,5 @@
 <template lang='jade'>
-.mdl-tabs__tab-bar(v-show='show')
+.mdl-tabs__tab-bar(v-show='show', :class="cclass")
   a.mdl-tabs__tab(v-for='n in names', 
     @click='clickTab($index)',
     :class='{ "is-active": selectedTab == $index }',
@@ -10,6 +10,7 @@
 export default {
   props: {
 		show: Boolean,
+    cclass: String,
     names: {
       type: Array,
       required: true

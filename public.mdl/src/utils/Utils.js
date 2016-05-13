@@ -21,4 +21,3 @@ export function filter(data, key, value, cant = null) {
 
   return m.slice(0, cant);
 }
-
