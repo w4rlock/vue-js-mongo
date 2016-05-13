@@ -1,26 +1,21 @@
 <script>
 import Loader from './Loader.vue'
 import StoreCol from '../stores/Collections'
-import { clone, filter } from '../utils/Utils'
-
+import TabBar from './TabBar'
+import DataGrid from './DataGrid'
+import Db from '../stores/Db'
+import { isImage, clone, filter } from '../utils/Utils'
 
 
 export default {
 	components: {
-		Loader
+		Loader,
+    DataGrid,
+    TabBar
 	},
 
-
-  data () {
-    return {
-		 	loading: false,
-      error: null,
-      model: {},
-      base: {},
-      keys: [],
-      relations: [],
-      models: []
-		}
+  data() {
+    return this.setDefaults();
   },
 
   events:{
@@ -30,86 +25,113 @@ export default {
   },
 
 
-
-
 	/*Form Events*/
 	methods: {
+    setDefaults(){
+      return {
+        model: {}
+      , base: {}
+      , keys: []
+      , selectedrel: { keys: [], entity: '', name: '' }
+      , relations: []
+      , error: null
+      , isImage: isImage
+      , loading: false
+      , tabs: []
+      }
+    },
+
 		clickCancel(){
-      this.model = {};
-      this.keys = [];
-      this.relations = [];
-      this.error = null;
-			this.$dispatch('clickcancel');
-		},
+      this.$refs.datagrid.show = false;
+      this.$refs.tabbar.selectedTab = 0;
+
+      this.$data = this.setDefaults();
+      this.$dispatch('clickcancel');
+    },
 
 
-		clickSave(){
+    clickSave(){
       this.error = null;
       StoreCol.addDocument(this.base.collection, this.model)
               .then(this.clickCancel);
-		},
+    },
 
 
     open(baseModel, model = null){
       this.base = baseModel;
       this.keys = filter(this.base.attrs, 'isObject', false);
-      if (!baseModel.isChildren)
-      this.relations = filter(this.base.attrs, 'isObject', true);
+      this.relations = filter(this.base.attrs, 'isObject', true) || [];
 
+      if (this.relations.length > 0){
+        this.relations.forEach((o) => this.model[o.name] = []);
+
+        this.tabs = this.relations.map(r => r.type);
+        this.tabs.splice(0,0,this.base.collection);
+      }
+
+      //edit mode - open existent model
       if (model){
         this.model = model;
       }
       else{
-        this.keys.forEach((o, i) => {
-          this.model[o.name] = o.isObject ? {} : null;
-        });
+        this.keys.forEach((o) => this.model[o.name] = null );
       }
+      this.upgradeComponents();
     },
 
-    
-    clickRelation(name){
-      let m = filter(this.models, 'collection', name, 1);
-      m.isChildren = true
-      this.open(m);
+
+    clickTab(index, name){
+      if (index > 0){
+        this.selectedrel.entity = name;
+        this.selectedrel.name = this.relations[index-1].name;
+        this.selectedrel.keys = this.relations[index-1].views;
+      }
+
+      this.$refs.datagrid.show = (index > 0);
     },
 
-    isImage(val){
-      if (!val) return false;
-      return val.match(/(.png|.jpg|.gif|jpeg|.svg)/i);
+    upgradeComponents(){
+      setTimeout(() => componentHandler.upgradeAllRegistered(), 500);
     }
   }
 }
 </script>
 
 <template lang='jade'>
-  .mdl-card.mdl-shadow--4dp.full.mh500
+  .mdl-card.mdl-shadow--4dp.full.mh700
     .overlay-wrap(v-show='loading')
       Loader(:show='true')
     .mdl-grid.w100
-      .mdl-cell.mdl-cell--3-col
+      .mdl-cell.mdl-cell--1-col
         mdl-button(@click='clickCancel', v-mdl-ripple-effect, raised, primary)
           i.material-icons keyboard_arrow_left
-      .mdl-cell.mdl-cell--5-col.tac
+      .mdl-cell.mdl-cell--2-col.tac
         mdl-button(@click='clickSave', v-mdl-ripple-effect, raised, primary)
           i.material-icons cloud_upload
 
+
     .mdl-grid.w100
-      .mdl-cell.mdl-cell--3-col.mdl-cell--3-col-tablet
-        div(v-for='k in relations')
-          mdl-button.w100.tal(@click='clickRelation(k.name)', v-mdl-ripple-effect) {{ k.name }}
+      .mdl-cell.mdl-cell--11-col.mdl-cell--11-col-tablet.ml50
+        .mdl-tabs.mdl-js-tabs.mdl-js-ripple-effect
+          tab-bar(v-ref:tabbar, :names.sync='tabs', v-on:clicktab='clickTab')
+          .mdl-tabs__panel.mt50(:id='"panel-"+base.collection', :class='{ "is-active": this.$refs.tabbar.selectedTab == 0 }') 
+            h4.err(v-show='error') {{ error }}
+            h5(v-if='model._id') {{ base.collection }}: {{ model._id }}
+            h5(v-else) New {{ base.collection }}
 
-      .mdl-cell.mdl-cell--8-col.mdl-cell--8-col-tablet.ml50
-        h4.err(v-show='error') {{ error }}
-        h4(v-if='model._id') {{ base.collection }}: {{ model._id }}
-        h4(v-else) New {{ base.collection }}
+            .frm
+              div(v-for='k in keys')
+                img.ico(v-if='isImage(model[k.name])', :src='model[k.name]')
+                mdl-textfield(floating-label, 
+                  :type.sync='k.type'
+                  :label.sync='k.name',
+                  :value.sync='model[k.name]')
 
-        .frmDoc
-          div(v-for='k in keys')
-            img.ico(v-if='isImage(model[k.name])', v-bind:src='model[k.name]')
-            mdl-textfield(floating-label, 
-              :type.sync='k.type'
-              :label.sync='k.name',
-              :value.sync='model[k.name]')
+          .mdl-tabs__panel.mt50.is-active
+            data-grid(v-ref:datagrid,:heads.sync='selectedrel.keys', 
+            :checks='model[selectedrel.name] || []', :entity='selectedrel.entity', :showidcol='false')
+      .mdl-cell.mdl-cell--1-col.mdl-cell--1-col-tablet.ml50
+
 </template>
 
 <style lang='stylus'>
@@ -127,10 +149,6 @@ export default {
 
 .err
   color red
-
-.frmDoc
-  .mdl-textfield
-    display block
 
 .color
   width 40px

@@ -112,6 +112,9 @@ html
 .mh500
   min-height 500px
 
+.mh700
+  min-height 700px
+
 .modal
   width: 70%
   z-index: 111
@@ -119,14 +122,45 @@ html
   @media(max-width: 730px)
     width 95%
 
+.section
+	border 1px solid #E1E1E1
+	.frm
+		padding 30px
+		.mdl-textfield
+			display block
+
+	h4
+		margin-top: -20px;
+		margin-bottom: 0px;
+		margin-left: -1px;
+		padding-right: 20px;
+		background: #333;
+		color: #fff;
+		font-size: 13px;
+		line-height: 17px;
+		font-weight: bold;
+		padding: 7.5px 20px;
+		display: -moz-inline-stack;
+		display: inline-block;
+		vertical-align: middle;
+		display: -moz-inline-stack;
+
 
 #app
   color: #2c3e50
   margin: 20px
 
-#app a
-  color: #42b983;
+a
+  color: #7B7B7B;
   text-decoration: none;
+  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0;
+
+a.is-active
+    color black
 
 .logo
   width: 100px;
@@ -178,6 +212,8 @@ html
   @media(max-width: 730px)
     width 95%
 
+.frm .mdl-textfield
+	display block
 </style>
 
 <template lang='jade'>

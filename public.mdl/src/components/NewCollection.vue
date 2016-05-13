@@ -22,13 +22,14 @@ export default {
       index: 0,
       model: {},
       error: null,
+      selectedRow: null,
       loading: false,
-      showTypes: false,
       baseModel: {
           name: ''
         , type: 'String'
         , isObject: false
         , required: false 
+        , views: []
       },
       primateTypes: [
           'id'
@@ -49,6 +50,7 @@ export default {
     setDefaults(){
       this.error = null;
       this.loading = false;
+      this.selectedRow = null,
       this.model = { 
           collection:'' 
         , attrs: [ clone(this.baseModel) ]
@@ -62,19 +64,20 @@ export default {
 
 
     selectType(elem, isObject){
+      this.selectedRow.name = '';
       //name recommended for sub-objects
       if (isObject){
-        this.model.attrs[this.index].name = elem;
+        this.selectedRow.name = elem;
       }
-      this.model.attrs[this.index].type = elem;
-      this.model.attrs[this.index].isObject = isObject;
-      this.showTypes = false;
+      this.selectedRow.type = elem;
+      this.selectedRow.isObject = isObject;
     },
 
 
-    openType(index) {
+    openType(index, item) {
       this.index = index;
-      this.showTypes = true;
+      this.selectedRow = item;
+      this.$refs.types.open(item);
     },
 
 
@@ -131,13 +134,18 @@ export default {
     open(mod){
       this.model = mod;
       this.entries = Object.entries(mod);
+      this.upgradeComponents();
     },
+
+    upgradeComponents(){
+      setTimeout(() => componentHandler.upgradeAllRegistered(), 200);
+    }
   }
 }
 </script>
 
 <template lang='jade'>
-  .mdl-card.mdl-shadow--4dp.full.mh500
+  .mdl-card.mdl-shadow--4dp.full.mh700
     .overlay-wrap(v-show='loading')
       Loader(:show='true')
     .container
@@ -172,8 +180,7 @@ export default {
     .mdl-grid
       .mdl-cell.mdl-cell--12-col.mdl-cell--12-col-tablet.black
         Types.popup(
-          :show='showTypes', 
-          v-on:clickcancel='showTypes=false',   
+          v-ref:types,
           v-on:select='selectType')
 
 </template>

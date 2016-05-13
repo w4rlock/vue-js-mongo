@@ -9,8 +9,8 @@ export default {
   },
 
   methods: {
-    clickType(index){
-      this.$dispatch('clicktype', index);
+    clickType(index, item){
+      this.$dispatch('clicktype', index, item);
     },
 
     clickAddNew(){
@@ -48,7 +48,7 @@ div(v-for='item in attrs', track-by="$index")
       label.mdl-textfield__label Key Name
 
 
-    mdl-button.btnType(@click='clickType(this.$index)', v-mdl-ripple-effect) {{ item.type }}
+    mdl-button.btnType(@click='clickType(this.$index, item)', v-mdl-ripple-effect) {{ item.type }}
     mdl-button(v-if="this.$index > 0", @click='clickRemove(this.$index)', v-mdl-ripple-effect)
       i.material-icons delete
 

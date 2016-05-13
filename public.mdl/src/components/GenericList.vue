@@ -43,7 +43,7 @@ export default {
 
       Db.getDocuments(this.bmodel.collection, p).then(r => {
         this.data = r.data.data;
-        this.gridRows = r.data.data.map(Object.values);
+        this.gridRows = r.data.data.map(this.rowMapMainEntity);
         this.notDataFound = (this.gridRows.length == 0);
 
         setTimeout(() => {
@@ -54,10 +54,19 @@ export default {
       });
     },
 
+    rowMapMainEntity(row){
+      let vals = [];
+      for (let k in row){
+        if (!this.hasChild(row[k])){
+          vals.push(row[k]);  
+        }  
+      } 
+      return vals;
+    },
 
     hasChild(field){
-      return ((typeof field != 'object')
-           && (!Array.isArray(field)));
+      return ((typeof field == 'object')
+           || (Array.isArray(field)));
     },
 
 
@@ -74,6 +83,7 @@ export default {
     clickOpen(){
       let pos = this.checks[0];
       let w = this.data[pos];
+
       this.$dispatch('clickopen', w);
     },
 
@@ -103,7 +113,7 @@ export default {
 
 
     checkImage(val){
-      if (!val) return false;
+      if (!val || Array.isArray(val)) return false;
       return val.match(/(.png|.jpg|.gif|jpeg|.svg)/i);
     }
   }
@@ -172,15 +182,14 @@ h3.info
           tr
             th.mdl-data-table__cell--non-numeric
             th.mdl-data-table__cell--non-numeric _id
-            th.mdl-data-table__cell--non-numeric(v-for='attr in gridHeads') {{ attr.name }}
+            th.mdl-data-table__cell--non-numeric(v-for='attr in gridHeads', v-if='!attr.isObject') {{ attr.name }}
 
         tbody
           tr(v-for='row in gridRows')
             td
-              label.mdl-checkbox.mdl-js-checkbox.mdl-js-ripple-effect(for='lapp_chk-{{$index}}')
-                input.mdl-checkbox__input(id='lapp_chk-{{$index}}',type='checkbox',v-model='checks',value='{{ $index }}')
+              mdl-checkbox(:value='$index', :checked.sync='checks')
 
-            td.mdl-data-table__cell--non-numeric(v-for='val in row')
+            td.mdl-data-table__cell--non-numeric(v-for='val in row', track-by='$index')
               .color(v-if='checkColor(this.$index)', v-bind:style="{ background: val }")
               div(v-else)
                 img.ico(v-if='checkImage(val)', v-bind:src='val')
@@ -188,5 +197,4 @@ h3.info
 
     .mdl-cell.mdl-cell--12-col(v-if='notDataFound')
       h3.info Not Data Found
-
 </template>
