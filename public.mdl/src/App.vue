@@ -99,6 +99,9 @@ html
 .w100
   width: 100%
 
+.tar
+  text-align right
+
 .tac
   text-align center
 
@@ -211,6 +214,10 @@ a.is-active
   height 100%
   @media(max-width: 730px)
     width 95%
+
+.flat
+  background: rgba(158,158,158,.2)
+  display: inline-block
 
 .frm .mdl-textfield
 	display block

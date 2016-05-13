@@ -96,10 +96,6 @@ export default {
 .active{
   background: grey !important;
 }
-.flat{
-	background: rgba(158,158,158,.2);
-  display: inline-block;
-}
 </style>
 
 <template lang='jade'>

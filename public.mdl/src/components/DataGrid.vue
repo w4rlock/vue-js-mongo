@@ -10,15 +10,21 @@ export default{
   },
 
   props:{
-    heads: { type: Array, required: true },
+    showheads: Boolean,
     checks: { type: Array },
+    heads: { type: Array, required: true },
     entity: { type: String, required: true },
     showidcol: { type: Boolean, required: true }
-    
   },
 
   data(){
     return this.defaults();
+  },
+
+  events: {
+    'filter:changed': function(val){
+      this.filterKey = val;
+    }
   },
 
   watch: {
@@ -34,11 +40,12 @@ export default{
   methods:{
     defaults(){
       return {
+        rows: [],
         show: false,
+        filterKey: '',
         result: null,
         notDataFound: null,
         loading: false,
-        rows: [],
         isImage: isImage
       }
     },
@@ -77,19 +84,30 @@ export default{
   }
 }
 </script>
+<style>
+.searchbtn{
+  min-width: 30px;
+  min-height: 30px;
+  width: 37px;
+  height: 36px;
+  margin-right: 20px;
+}
+</style>
 
 <template lang='jade'>
-Loader(:show='loading', :type='"spinner"')
-table.mdl-data-table.mdl-js-data-table.ml-table-striped.mdl-shadow--1dp(v-show='show')
-  thead
-    tr
-      th.mdl-data-table__cell--non-numeric
-      th.mdl-data-table__cell--non-numeric(v-for='head in heads', track-by='$index', v-if='showidcol || $index!=0') {{ head }}
-  tbody  
-    tr(v-for='row in rows')
-      td
-        mdl-checkbox(:value='row[0]', :checked.sync='checks')
-      td.mdl-data-table__cell--non-numeric(v-for='val in row', track-by='$index', v-if='showidcol || $index != 0')
-        img.ico(v-if='isImage(val)', v-bind:src='val')
-        span(v-else){{ val }}
+div(v-show='show')
+  Loader(:show='loading', :type='"spinner"')
+
+  table.mdl-data-table.mdl-js-data-table.ml-table-striped.mdl-shadow--1dp
+    thead(v-if='showheads')
+      tr
+        th.mdl-data-table__cell--non-numeric
+        th.mdl-data-table__cell--non-numeric(v-for='head in heads', track-by='$index', v-if='showidcol || $index!=0') {{ head }}
+    tbody  
+      tr(v-for='row in rows | filterBy filterKey')
+        td
+          mdl-checkbox(:value='row[0]', :checked.sync='checks')
+        td.mdl-data-table__cell--non-numeric(v-for='val in row', track-by='$index', v-if='showidcol || $index != 0')
+          img.ico(v-if='isImage(val)', v-bind:src='val')
+          span(v-else){{ val }}
 </template>

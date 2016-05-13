@@ -1,13 +1,21 @@
 <template lang='jade'>
 .mdl-tabs__tab-bar(v-show='show', :class="cclass")
+  search-input 
   a.mdl-tabs__tab(v-for='n in names', 
     @click='clickTab($index)',
     :class='{ "is-active": selectedTab == $index }',
     :href='"#panel-"+ n') {{ n }}
+
 </template>
 
 <script>
+import SearchInput from './SearchInput'
+
 export default {
+  components: {
+    SearchInput  
+  },
+
   props: {
 		show: Boolean,
     cclass: String,
@@ -53,3 +61,11 @@ export default {
   }
 }
 </script>
+
+<style>
+.searchinput{
+	position: absolute;
+	left: 5px;
+	top: 3px;
+}
+</style>

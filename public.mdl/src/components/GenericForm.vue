@@ -38,6 +38,7 @@ export default {
       , isImage: isImage
       , loading: false
       , tabs: []
+      , showsearchinput: false
       }
     },
 
@@ -105,10 +106,9 @@ export default {
       .mdl-cell.mdl-cell--1-col
         mdl-button(@click='clickCancel', v-mdl-ripple-effect, raised, primary)
           i.material-icons keyboard_arrow_left
-      .mdl-cell.mdl-cell--2-col.tac
+      .mdl-cell.mdl-cell--3-col.tac
         mdl-button(@click='clickSave', v-mdl-ripple-effect, raised, primary)
           i.material-icons cloud_upload
-
 
     .mdl-grid.w100
       .mdl-cell.mdl-cell--11-col.mdl-cell--11-col-tablet.ml50
@@ -128,8 +128,14 @@ export default {
                   :value.sync='model[k.name]')
 
           .mdl-tabs__panel.is-active.absolute
-            data-grid(v-ref:datagrid,:heads.sync='selectedrel.keys', 
-            :checks='model[selectedrel.name] || []', :entity='selectedrel.entity', :showidcol='false')
+
+            data-grid(v-ref:datagrid,
+              :showheads='false', 
+              :heads.sync='selectedrel.keys', 
+              :checks='model[selectedrel.name] || []', 
+              :entity='selectedrel.entity', 
+              :showidcol='false')
+
       .mdl-cell.mdl-cell--1-col.mdl-cell--1-col-tablet.ml50
 
 </template>
