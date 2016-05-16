@@ -125,7 +125,7 @@ export default {
 
           div(v-show='viewAttrs && viewAttrs.length > 0')
             div(v-for='a in viewAttrs')
-              mdl-checkbox(:value='a.name', :checked.sync='selected.views')
+              mdl-checkbox(:value='a.name', :checked.sync='selected.views', v-if='!a.isObject')
                 span.mdl-checkbox__label
                   {{ a.name }}
 </template>

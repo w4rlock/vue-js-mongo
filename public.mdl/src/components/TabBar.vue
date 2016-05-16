@@ -1,6 +1,6 @@
 <template lang='jade'>
 .mdl-tabs__tab-bar(v-show='show', :class="cclass")
-  search-input 
+  search-input(v-ref:searchinput)
   a.mdl-tabs__tab(v-for='n in names', 
     @click='clickTab($index)',
     :class='{ "is-active": selectedTab == $index }',
@@ -29,10 +29,6 @@ export default {
     return this.defaults();
   },
 
-  reset(){
-    this.$data = this.defaults();
-  },
-
 	watch: {
 		names(){
 			this.show = (this.names && this.names.length > 0);
@@ -40,6 +36,11 @@ export default {
 	},
 
   methods:{
+    reset(){
+      this.$data = this.defaults();
+      this.$refs.searchinput.reset();
+    },
+
     defaults(){
       return {
         current: 0,

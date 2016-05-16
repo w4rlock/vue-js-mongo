@@ -157,7 +157,7 @@ h3.info
 <template lang='jade'>
   .mdl-card.md-full-card
     Loader(:show='loading')
-    .mdl-grid
+    .mdl-grid.w100
       .mdl-cell.mdl-cell--10-col
         mdl-button(@click='clickNew', v-mdl-ripple-effect, raised, primary)
           i.material-icons add
@@ -171,8 +171,7 @@ h3.info
         mdl-button(@click='clickRefresh', v-mdl-ripple-effect, raised, primary)
           i.material-icons refresh
 
-      .mdl-cell.mdl-cell--2-col
-        mdl-button(@click='this.$dispatch("clickeditmodel")', v-mdl-ripple-effect, raised)
+        mdl-button.flat(@click='this.$dispatch("clickeditmodel")', v-mdl-ripple-effect)
           i.material-icons visibility
 
     .mdl-cell.mdl-cell--12-col(v-if='gridRows.length > 0')

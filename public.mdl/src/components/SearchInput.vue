@@ -2,7 +2,16 @@
 .searchwrap(:class='{ "w100": showInput}')
   mdl-button.flat(v-mdl-ripple-effect, @click='showInput=true') 
     i.material-icons search
-  mdl-textfield(v-show='showInput', :value.sync='filter')
+
+  input(type='text', 
+    v-focus='showInput',
+    v-model='filter', 
+    v-show='showInput',
+    v-onfocusout='focusout',
+    placeholder='Search...',
+    @keydown.enter='showInput=false'
+  )
+
 </template>
 
 <script>
@@ -13,9 +22,6 @@ export default{
 
   watch: {
     filter(){
-      if (!this.filter){
-        this.showInput = false;
-      }
       this.$root.$broadcast('filter:changed', this.filter);
     }
   },
@@ -30,6 +36,14 @@ export default{
         filter: '',
         showInput: false
       }
+    },
+
+    focusout(){
+      this.showInput = false;
+    },
+
+    clickClean(){
+      this.filter = '';
     }
   }
 }
@@ -49,10 +63,15 @@ export default{
     margin 0px
     border-radius 0px
     background: rgb(213, 213, 213)
+		border: 1px solid #9F9F9F
 
-  .mdl-textfield
-    position absolute
+  .searchclosebtn
+    position: absolute
+    right: 0
+    top: 0
+
+  input
+    height 42px
     padding-left 15px
-    width: 100%
-
+    width: calc(100% - 84px)
 </style>

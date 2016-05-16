@@ -44,7 +44,7 @@ export default {
 
 		clickCancel(){
       this.$refs.datagrid.show = false;
-      this.$refs.tabbar.selectedTab = 0;
+      this.$refs.tabbar.reset();
 
       this.$data = this.setDefaults();
       this.$dispatch('clickcancel');
@@ -113,7 +113,7 @@ export default {
     .mdl-grid.w100
       .mdl-cell.mdl-cell--11-col.mdl-cell--11-col-tablet.ml50
         .mdl-tabs.mdl-js-tabs.mdl-js-ripple-effect
-          tab-bar(v-ref:tabbar, :names.sync='tabs', v-on:clicktab='clickTab', :cclass='"greyBar"')
+          tab-bar(v-ref:tabbar, :names.sync='tabs', v-on:clicktab='clickTab', :cclass='"bar"')
           .mdl-tabs__panel.mt90(:id='"panel-"+base.collection', :class='{ "is-active": this.$refs.tabbar.selectedTab == 0 }') 
             h4.err(v-show='error') {{ error }}
             h5(v-if='model._id') {{ base.collection }}: {{ model._id }}
@@ -147,13 +147,12 @@ export default {
 .mt50
   margin-top 50px
 
-.greyBar
+.bar
   position: absolute;
   left: 0;
   right: 0;
   width: 100%;
   top: 85px;
-  background: #F3F3F3;
   border-top: 1px solid #e0e0e0;
 
 .absolute

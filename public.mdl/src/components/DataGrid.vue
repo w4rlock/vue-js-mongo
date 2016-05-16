@@ -23,7 +23,7 @@ export default{
 
   events: {
     'filter:changed': function(val){
-      this.filterKey = val;
+      this.filterKey = (val.length > 1) ? val : '';
     }
   },
 
@@ -92,13 +92,20 @@ export default{
   height: 36px;
   margin-right: 20px;
 }
+
+#genericGrid tr:last-child td{
+	border-bottom: 0px !important;
+}
+#genericGrid tr:first-child td{
+border-top: 0px !important;
+}
 </style>
 
 <template lang='jade'>
 div(v-show='show')
   Loader(:show='loading', :type='"spinner"')
 
-  table.mdl-data-table.mdl-js-data-table.ml-table-striped.mdl-shadow--1dp
+  table.mdl-data-table.mdl-js-data-table.ml-table-striped.mdl-shadow--1dp(id='genericGrid')
     thead(v-if='showheads')
       tr
         th.mdl-data-table__cell--non-numeric
