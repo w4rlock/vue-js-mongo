@@ -63,6 +63,7 @@ export default {
         'Boolean'
       , 'Number'
       , 'String'
+      , 'Password'
       , 'Date'
       , 'Url'
       , 'Email'

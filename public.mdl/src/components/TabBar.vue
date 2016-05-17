@@ -51,6 +51,7 @@ export default {
     clickTab(index){
       this.current = index-1;
       this.selectedTab = index;
+      this.$refs.searchinput.hide(this.selectedTab==0);
       this.$dispatch('clicktab', index, this.names[index]);
     }  
   },

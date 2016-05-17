@@ -2,6 +2,7 @@
 import Loader from './Loader.vue'
 import Db from '../stores/Db'
 import StoreCol from '../stores/Collections'
+import { filter } from '../utils/Utils'
 
 export default {
   components: {
@@ -32,7 +33,7 @@ export default {
   methods: {
     setModel(c){
       this.bmodel = c;
-      this.gridHeads = c.attrs;
+      this.gridHeads = filter(c.attrs,'isObject', false);
     },
 
 
@@ -151,11 +152,14 @@ table
 h3.info
   text-align center
 
+td .color
+  width 50px
+  height 30px
 </style>
 
 
 <template lang='jade'>
-  .mdl-card.md-full-card
+  .mdl-card.md-full-card.mh500
     Loader(:show='loading')
     .mdl-grid.w100
       .mdl-cell.mdl-cell--10-col
@@ -181,7 +185,7 @@ h3.info
           tr
             th.mdl-data-table__cell--non-numeric
             th.mdl-data-table__cell--non-numeric _id
-            th.mdl-data-table__cell--non-numeric(v-for='attr in gridHeads', v-if='!attr.isObject') {{ attr.name }}
+            th.mdl-data-table__cell--non-numeric(v-for='attr in gridHeads') {{ attr.name }}
 
         tbody
           tr(v-for='row in gridRows')

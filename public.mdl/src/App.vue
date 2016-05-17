@@ -93,6 +93,10 @@ export default {
 </script>
 
 <style lang="stylus">
+wh(w, h)
+  width w
+  height h
+
 html
   height: 100%
 

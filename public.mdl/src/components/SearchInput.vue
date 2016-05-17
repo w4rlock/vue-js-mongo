@@ -1,9 +1,9 @@
 <template lang='jade'>
-.searchwrap(:class='{ "w100": showInput}')
+.searchwrap(:class='{ "w100": showInput}', v-show='show')
   mdl-button.flat(v-mdl-ripple-effect, @click='showInput=true') 
     i.material-icons search
 
-  input(type='text', 
+  input(type='search', 
     v-focus='showInput',
     v-model='filter', 
     v-show='showInput',
@@ -27,12 +27,17 @@ export default{
   },
 
   methods:{
+    hide(hide){
+      this.show = !hide;
+    },
+
     reset(){
       this.$data = this.defaults();
     },
 
     defaults(){
       return {
+        show: false,
         filter: '',
         showInput: false
       }
@@ -63,7 +68,7 @@ export default{
     margin 0px
     border-radius 0px
     background: rgb(213, 213, 213)
-		border: 1px solid #9F9F9F
+		//border: 1px solid #9F9F9F
 
   .searchclosebtn
     position: absolute
@@ -74,4 +79,11 @@ export default{
     height 42px
     padding-left 15px
     width: calc(100% - 84px)
+    font-family: "Roboto","Helvetica","Arial",sans-serif
+    font-size: 18px
+    appearance: none
+    border: 0
+
+    &:focus
+       outline: none
 </style>

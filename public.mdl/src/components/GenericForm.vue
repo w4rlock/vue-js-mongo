@@ -25,8 +25,7 @@ export default {
   },
 
 
-	/*Form Events*/
-	methods: {
+  methods:{
     setDefaults(){
       return {
         model: {}
@@ -42,58 +41,69 @@ export default {
       }
     },
 
-		clickCancel(){
-      this.$refs.datagrid.show = false;
-      this.$refs.tabbar.reset();
+    clickCancel(){
+        this.$refs.datagrid.show = false;
+        this.$refs.tabbar.reset();
 
-      this.$data = this.setDefaults();
-      this.$dispatch('clickcancel');
-    },
-
-
-    clickSave(){
-      this.error = null;
-      StoreCol.addDocument(this.base.collection, this.model)
-              .then(this.clickCancel);
-    },
+        this.$data = this.setDefaults();
+        this.$dispatch('clickcancel');
+      },
 
 
-    open(baseModel, model = null){
-      this.base = baseModel;
-      this.keys = filter(this.base.attrs, 'isObject', false);
-      this.relations = filter(this.base.attrs, 'isObject', true) || [];
+      clickSave(){
+        this.error = null;
+        StoreCol.addDocument(this.base.collection, this.model)
+                .then(this.clickCancel);
+      },
 
-      if (this.relations.length > 0){
+
+      open(baseModel, model = null){
+        this.base = baseModel;
+        this.keys = filter(this.base.attrs, 'isObject', false);
+        this.relations = filter(this.base.attrs, 'isObject', true) || [];
+
+        if (this.relations.length > 0){
+          this.tabs = this.relations.map(r => r.type);
+          this.tabs.splice(0,0,this.base.collection);
+        }
+
+        //edit mode - open existent model
+        if (model){
+          this.model = model;
+        }
+        else{
+          this.initializeFormModel();
+        }
+        this.upgradeComponents();
+      },
+
+
+      initializeFormModel(){
         this.relations.forEach((o) => this.model[o.name] = []);
 
-        this.tabs = this.relations.map(r => r.type);
-        this.tabs.splice(0,0,this.base.collection);
+        this.keys.forEach((o) => {
+          if (o.type == 'Boolean'){
+            this.model[o.name] = false;
+          }
+          else{
+            this.model[o.name] = null 
+          }
+        });
+      },
+
+      clickTab(index, name){
+        if (index > 0){
+          this.selectedrel.entity = name;
+          this.selectedrel.name = this.relations[index-1].name;
+          this.selectedrel.keys = this.relations[index-1].views;
+        }
+
+        this.$refs.datagrid.show = (index > 0);
+      },
+
+      upgradeComponents(){
+        setTimeout(() => componentHandler.upgradeAllRegistered(), 500);
       }
-
-      //edit mode - open existent model
-      if (model){
-        this.model = model;
-      }
-      else{
-        this.keys.forEach((o) => this.model[o.name] = null );
-      }
-      this.upgradeComponents();
-    },
-
-
-    clickTab(index, name){
-      if (index > 0){
-        this.selectedrel.entity = name;
-        this.selectedrel.name = this.relations[index-1].name;
-        this.selectedrel.keys = this.relations[index-1].views;
-      }
-
-      this.$refs.datagrid.show = (index > 0);
-    },
-
-    upgradeComponents(){
-      setTimeout(() => componentHandler.upgradeAllRegistered(), 500);
-    }
   }
 }
 </script>
@@ -103,32 +113,39 @@ export default {
     .overlay-wrap(v-show='loading')
       Loader(:show='true')
     .mdl-grid.w100
-      .mdl-cell.mdl-cell--1-col
+      .mdl-cell.mdl-cell--6-col
         mdl-button(@click='clickCancel', v-mdl-ripple-effect, raised, primary)
           i.material-icons keyboard_arrow_left
-      .mdl-cell.mdl-cell--3-col.tac
-        mdl-button(@click='clickSave', v-mdl-ripple-effect, raised, primary)
+        mdl-button.flat(@click='clickSave', v-mdl-ripple-effect) 
           i.material-icons cloud_upload
 
     .mdl-grid.w100
       .mdl-cell.mdl-cell--11-col.mdl-cell--11-col-tablet.ml50
         .mdl-tabs.mdl-js-tabs.mdl-js-ripple-effect
           tab-bar(v-ref:tabbar, :names.sync='tabs', v-on:clicktab='clickTab', :cclass='"bar"')
-          .mdl-tabs__panel.mt90(:id='"panel-"+base.collection', :class='{ "is-active": this.$refs.tabbar.selectedTab == 0 }') 
+
+          .mdl-tabs__panel(:id='"panel-"+base.collection', :class='{"mt90": (relations.length > 0), "is-active": this.$refs.tabbar.selectedTab == 0 }') 
+
             h4.err(v-show='error') {{ error }}
             h5(v-if='model._id') {{ base.collection }}: {{ model._id }}
             h5(v-else) New {{ base.collection }}
 
             .frm
               div(v-for='k in keys')
-                img.ico(v-if='isImage(model[k.name])', :src='model[k.name]')
-                mdl-textfield(floating-label, 
-                  :type.sync='k.type'
-                  :label.sync='k.name',
-                  :value.sync='model[k.name]')
+                div(v-if='k.type=="Boolean"') 
+                  .mdl-textfield--floating-label.is-focused {{ k.name }}
+                  mdl-switch(:checked.sync='model[k.name]', value='true')
 
-          .mdl-tabs__panel.is-active.absolute
+                div(v-else)
+                  img.ico(v-if='isImage(model[k.name])', :src='model[k.name]')
 
+                  mdl-textfield(floating-label, 
+                    :class='{ "color": k.type == "Color" }',
+                    :type.sync='k.type'
+                    :label.sync='k.name',
+                    :value.sync='model[k.name]')
+
+          .mdl-tabs__panel.absolute(:class='{ "is-active": this.$refs.tabbar.selectedTab != 0 }')
             data-grid(v-ref:datagrid,
               :showheads='false', 
               :heads.sync='selectedrel.keys', 
@@ -141,6 +158,9 @@ export default {
 </template>
 
 <style lang='stylus'>
+.mdl-tabs__panel
+  min-height 350px
+
 .mt90
   margin-top 90px
 
@@ -175,6 +195,8 @@ export default {
   color red
 
 .color
-  width 40px
-  height 30px
+  input
+    width 50px
+    height 50px
+  
 </style>

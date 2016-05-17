@@ -64,7 +64,6 @@ export default {
 
 
     selectType(elem, isObject){
-      this.selectedRow.name = '';
       //name recommended for sub-objects
       if (isObject){
         this.selectedRow.name = elem;
@@ -150,16 +149,15 @@ export default {
       Loader(:show='true')
     .container
       .mdl-grid.w100
-        .mdl-cell.mdl-cell--3-col.mdl-cell.mdl-cell--4-col-tablet
+        .mdl-cell.mdl-cell--12-col.mdl-cell
           mdl-button(@click='close("clickcancel")()', v-mdl-ripple-effect, raised, primary)
             i.material-icons keyboard_arrow_left
 
-
-        .mdl-cell.mdl-cell--5-col.tac
-          mdl-button(@click='clickSave', v-mdl-ripple-effect, raised, primary)
+          mdl-button.flat(@click='clickSave', v-mdl-ripple-effect)
             i.material-icons cloud_upload
-          mdl-button(v-if='model._id', @click='clickErase', v-mdl-ripple-effect, raised, primary)
+          mdl-button.flat(v-if='model._id', @click='clickErase', v-mdl-ripple-effect)
             i.material-icons delete_forever
+
 
     .mdl-grid
       h4.err(v-show='error') {{ error }}
