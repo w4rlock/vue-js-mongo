@@ -31,7 +31,7 @@ export default {
         model: {}
       , base: {}
       , keys: []
-      , selectedrel: { keys: [], entity: '', name: '' }
+      , selectedrel: { views: [], viewname: '', jsonfield: '' }
       , relations: []
       , error: null
       , isImage: isImage
@@ -52,7 +52,7 @@ export default {
 
       clickSave(){
         this.error = null;
-        StoreCol.addDocument(this.base.collection, this.model)
+        StoreCol.addDocument(this.base.dbcollection, this.model)
                 .then(this.clickCancel);
       },
 
@@ -63,8 +63,8 @@ export default {
         this.relations = filter(this.base.attrs, 'isObject', true) || [];
 
         if (this.relations.length > 0){
-          this.tabs = this.relations.map(r => r.type);
-          this.tabs.splice(0,0,this.base.collection);
+          this.tabs = this.relations.map(r => r.viewname);
+          this.tabs.splice(0,0,this.base.viewcollection);
         }
 
         //edit mode - open existent model
@@ -79,23 +79,23 @@ export default {
 
 
       initializeFormModel(){
-        this.relations.forEach((o) => this.model[o.name] = []);
+        this.relations.forEach((o) => this.model[o.jsonfield] = []);
 
         this.keys.forEach((o) => {
           if (o.type == 'Boolean'){
-            this.model[o.name] = false;
+            this.model[o.jsonfield] = false;
           }
           else{
-            this.model[o.name] = null 
+            this.model[o.jsonfield] = null 
           }
         });
       },
 
       clickTab(index, name){
         if (index > 0){
-          this.selectedrel.entity = name;
-          this.selectedrel.name = this.relations[index-1].name;
-          this.selectedrel.keys = this.relations[index-1].views;
+          this.selectedrel.jsonfield = this.relations[index-1].jsonfield;
+          this.selectedrel.viewname = this.relations[index-1].viewname;
+          this.selectedrel.views = this.relations[index-1].views;
         }
 
         this.$refs.datagrid.show = (index > 0);
@@ -124,33 +124,33 @@ export default {
         .mdl-tabs.mdl-js-tabs.mdl-js-ripple-effect
           tab-bar(v-ref:tabbar, :names.sync='tabs', v-on:clicktab='clickTab', :cclass='"bar"')
 
-          .mdl-tabs__panel(:id='"panel-"+base.collection', :class='{"mt90": (relations.length > 0), "is-active": this.$refs.tabbar.selectedTab == 0 }') 
+          .mdl-tabs__panel(:id='"panel-"+base.dbcollection', :class='{"mt90": (relations.length > 0), "is-active": this.$refs.tabbar.selectedTab == 0 }') 
 
             h4.err(v-show='error') {{ error }}
-            h5(v-if='model._id') {{ base.collection }}: {{ model._id }}
-            h5(v-else) New {{ base.collection }}
+            h5(v-if='model._id') {{ base.viewcollection }}: {{ model._id }}
+            h5(v-else) New {{ base.viewcollection }}
 
             .frm
               div(v-for='k in keys')
                 div(v-if='k.type=="Boolean"') 
-                  .mdl-textfield--floating-label.is-focused {{ k.name }}
-                  mdl-switch(:checked.sync='model[k.name]', value='true')
+                  .mdl-textfield--floating-label.is-focused {{ k.viewname }}
+                  mdl-switch(:checked.sync='model[k.jsonfield]', value='true')
 
                 div(v-else)
-                  img.ico(v-if='isImage(model[k.name])', :src='model[k.name]')
+                  img.ico(v-if='isImage(model[k.name])', :src='model[k.jsonfield]')
 
                   mdl-textfield(floating-label, 
                     :class='{ "color": k.type == "Color" }',
                     :type.sync='k.type'
-                    :label.sync='k.name',
-                    :value.sync='model[k.name]')
+                    :label.sync='k.viewname',
+                    :value.sync='model[k.jsonfield]')
 
           .mdl-tabs__panel.absolute(:class='{ "is-active": this.$refs.tabbar.selectedTab != 0 }')
             data-grid(v-ref:datagrid,
               :showheads='false', 
-              :heads.sync='selectedrel.keys', 
-              :checks='model[selectedrel.name] || []', 
-              :entity='selectedrel.entity', 
+              :heads.sync='selectedrel.views', 
+              :checks='model[selectedrel.jsonfield] || []', 
+              :entity='selectedrel.jsonfield', 
               :showidcol='false')
 
       .mdl-cell.mdl-cell--1-col.mdl-cell--1-col-tablet.ml50

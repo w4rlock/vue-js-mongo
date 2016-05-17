@@ -123,7 +123,7 @@ html
   min-height 700px
 
 .modal
-  width: 70%
+  width: 80%
   z-index: 111
   height 100%
   @media(max-width: 730px)
@@ -235,7 +235,7 @@ a.is-active
           mdl-button(v-for='m in models',
             v-mdl-ripple-effect
             v-bind:class="{ 'selectedBtn': this.$index == currentIndex }",
-            @click='clickCollection(this.$index)') {{ m.collection }}
+            @click='clickCollection(this.$index)') {{ m.viewcollection }}
 
           mdl-button(@click='showFormCollection=true', v-mdl-ripple-effect)
             i.material-icons add

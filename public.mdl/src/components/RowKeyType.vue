@@ -36,6 +36,11 @@ export default {
 <style lang='stylus'>
 .rowInput
   display inline-block
+  .mdl-textfield
+    width 120px
+    margin-right 30px
+  .docs
+    width 270px
 
 </style>
 
@@ -43,10 +48,19 @@ export default {
 div(v-for='item in attrs', track-by="$index")
   .rowInput
     .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty(
-      v-bind:class="{ 'invalid': !item.name,'is-dirty': item.name }")
-      input.mdl-textfield__input(v-model='item.name')
-      label.mdl-textfield__label Key Name
+      v-bind:class="{ 'invalid': !item.viewname,'is-dirty': item.viewname }")
+      input.mdl-textfield__input(v-model='item.viewname')
+      label.mdl-textfield__label Visual Name
 
+    .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty(
+      v-bind:class="{ 'invalid': !item.jsonfield,'is-dirty': item.jsonfield }")
+      input.mdl-textfield__input(v-model='item.jsonfield')
+      label.mdl-textfield__label Json Field
+
+    .mdl-textfield.docs.mdl-js-textfield.mdl-textfield--floating-label.is-dirty(
+      v-bind:class="{ 'is-dirty': item.comment }")
+      input.mdl-textfield__input(v-model='item.comment')
+      label.mdl-textfield__label Comment (docs)
 
     mdl-button.btnType(@click='clickType(this.$index, item)', v-mdl-ripple-effect) {{ item.type }}
     mdl-button(v-if="this.$index > 0", @click='clickRemove(this.$index)', v-mdl-ripple-effect)

@@ -67,7 +67,6 @@ export default{
     height 100%
     margin 0px
     border-radius 0px
-    background: rgb(213, 213, 213)
 		//border: 1px solid #9F9F9F
 
   .searchclosebtn

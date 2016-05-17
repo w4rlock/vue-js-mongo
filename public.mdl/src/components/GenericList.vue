@@ -42,15 +42,13 @@ export default {
       this.checks = [];
       this.loading = true;
 
-      Db.getDocuments(this.bmodel.collection, p).then(r => {
+      Db.getDocuments(this.bmodel.dbcollection, p).then(r => {
         this.data = r.data.data;
         this.gridRows = r.data.data.map(this.rowMapMainEntity);
         this.notDataFound = (this.gridRows.length == 0);
+        this.loading = false;
 
-        setTimeout(() => {
-          componentHandler.upgradeAllRegistered()
-          this.loading = false;
-        }, 100);
+        setTimeout(() => { componentHandler.upgradeAllRegistered() }, 100);
 
       });
     },
@@ -97,7 +95,7 @@ export default {
     clickDelete(){
       this.checks.forEach((i) => {
         let id = this.data[i]._id;
-        StoreCol.removeDocument(this.bmodel.collection, id); 
+        StoreCol.removeDocument(this.bmodel.dbcollection, id); 
       });
       setTimeout(() => { this.search(); }, 300);
     },
@@ -185,7 +183,7 @@ td .color
           tr
             th.mdl-data-table__cell--non-numeric
             th.mdl-data-table__cell--non-numeric _id
-            th.mdl-data-table__cell--non-numeric(v-for='attr in gridHeads') {{ attr.name }}
+            th.mdl-data-table__cell--non-numeric(v-for='attr in gridHeads') {{ attr.viewname }}
 
         tbody
           tr(v-for='row in gridRows')

@@ -25,7 +25,8 @@ export default {
       selectedRow: null,
       loading: false,
       baseModel: {
-          name: ''
+          viewname: ''
+        , jsonfield: ''
         , type: 'String'
         , isObject: false
         , required: false 
@@ -52,7 +53,8 @@ export default {
       this.loading = false;
       this.selectedRow = null,
       this.model = { 
-          collection:'' 
+          dbcollection:'' 
+        , viewcollection:'' 
         , attrs: [ clone(this.baseModel) ]
       }
     },
@@ -64,10 +66,6 @@ export default {
 
 
     selectType(elem, isObject){
-      //name recommended for sub-objects
-      if (isObject){
-        this.selectedRow.name = elem;
-      }
       this.selectedRow.type = elem;
       this.selectedRow.isObject = isObject;
     },
@@ -95,7 +93,7 @@ export default {
 
     clickErase(){
       this.loading = true;
-      StoreCol.remove(this.model.collection)
+      StoreCol.remove(this.model.dbcollection)
               .then(r => StoreCol.removeDocument('model', this.model._id))
               .then(this.close('clickerase'))
               .catch(this.showErrorDB);
@@ -115,7 +113,7 @@ export default {
                 .catch(this.showErrorDB);
       }
       else{
-        StoreCol.create(this.model.collection)
+        StoreCol.create(this.model.dbcollection)
                 .then(r=> StoreCol.addDocument('model',this.model))
                 .then(this.close('clickadded'))
                 .catch(this.showErrorDB);
@@ -162,12 +160,18 @@ export default {
     .mdl-grid
       h4.err(v-show='error') {{ error }}
       .mdl-cell.mdl-cell--12-col.mdl-cell--12-col-tablet
-        h3(v-if='model._id') {{ model.collection }}
+        h3(v-if='model._id') {{ model.viewcollection }} :: {{ model.dbcollection }}
+        .rowInput(v-else)
 
-        #txtCName.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty.is-focused(
-        v-else, v-bind:class="{ 'invalid': !model.collection }")
-          input.mdl-textfield__input(v-model='model.collection')
-          label.mdl-textfield__label Collection Name
+          #txtCName.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused(
+            v-bind:class="{ 'invalid': !item.viewcollection,'is-dirty': item.viewcollection }")
+            input.mdl-textfield__input(v-model='model.viewcollection')
+            label.mdl-textfield__label Menu Name
+
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused(
+            v-bind:class="{ 'invalid': !item.viewcollection,'is-dirty': item.viewcollection }")
+            input.mdl-textfield__input(v-model='model.dbcollection')
+            label.mdl-textfield__label Entity Name
 
         row-key-type(
           :autoremove='true',
