@@ -22,11 +22,14 @@ export default{
 
   watch: {
     filter(){
-      this.$root.$broadcast('filter:changed', this.filter);
+      let k = this.eventkey || 'filter:changed';
+      this.$root.$broadcast(k , this.filter);
     }
   },
 
   methods:{
+    props: ['eventkey'],
+
     hide(hide){
       this.show = !hide;
     },

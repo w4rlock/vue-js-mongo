@@ -1,0 +1,13 @@
+{
+  "name": "Picoresa",
+  "version": "0.0.1",
+  "description": "Webphotos album - amazon web services",
+  "sampleUrl": false,
+  "apidoc": "0.2.0",
+  "generator": {
+    "name": "apidoc",
+    "time": "2015-04-08T03:57:21.448Z",
+    "url": "http://apidocjs.com",
+    "version": "0.12.1"
+  }
+}

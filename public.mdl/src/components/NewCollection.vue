@@ -53,8 +53,8 @@ export default {
       this.loading = false;
       this.selectedRow = null,
       this.model = { 
-          dbcollection:'' 
-        , viewcollection:'' 
+          dbcollection: null
+        , viewcollection: null
         , attrs: [ clone(this.baseModel) ]
       }
     },
@@ -160,16 +160,16 @@ export default {
     .mdl-grid
       h4.err(v-show='error') {{ error }}
       .mdl-cell.mdl-cell--12-col.mdl-cell--12-col-tablet
-        h3(v-if='model._id') {{ model.viewcollection }} :: {{ model.dbcollection }}
+        h3(v-if='model._id') {{ model.viewcollection }} : {{ model.dbcollection }}
         .rowInput(v-else)
 
-          #txtCName.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused(
-            v-bind:class="{ 'invalid': !item.viewcollection,'is-dirty': item.viewcollection }")
+          #txtCName.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label(
+            v-bind:class="{ 'invalid': !model.viewcollection, 'is-dirty': model.viewcollection }")
             input.mdl-textfield__input(v-model='model.viewcollection')
             label.mdl-textfield__label Menu Name
 
-          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-focused(
-            v-bind:class="{ 'invalid': !item.viewcollection,'is-dirty': item.viewcollection }")
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label(
+            v-bind:class="{ 'invalid': !model.dbcollection, 'is-dirty': model.dbcollection }")
             input.mdl-textfield__input(v-model='model.dbcollection')
             label.mdl-textfield__label Entity Name
 

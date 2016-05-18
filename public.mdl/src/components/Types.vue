@@ -21,7 +21,7 @@ export default {
     },
 
     loadAttrs(modelName){
-      this.viewAttrs = filter(this.collections, 'collection', modelName, 1).attrs;
+      this.viewAttrs = filter(this.collections, 'viewcollection', modelName, 1).attrs;
     },
 
     clickCancel(){
@@ -45,6 +45,7 @@ export default {
         this.loadAttrs(name);
         return;
       }
+
       setTimeout(() => { 
         this.$dispatch('select', name, isObject); 
         this.show = !this.show 
@@ -121,8 +122,8 @@ export default {
           .separator
           ol.demo-list-item.mdl-list
             li.mdl-list__item(v-for='t in collections')
-              mdl-button.flat(v-bind:class="{ 'active': selected && t.collection == selected.type }",
-                @click='clickSelect(t.collection, true)', v-mdl-ripple-effect) {{ t.collection }}
+              mdl-button.flat(v-bind:class="{ 'active': selected && t.viewcollection == selected.type }",
+                @click='clickSelect(t.viewcollection, true)', v-mdl-ripple-effect) {{ t.viewcollection }}
 
           div(v-show='viewAttrs && viewAttrs.length > 0')
             div(v-for='a in viewAttrs')

@@ -14,7 +14,6 @@ export default {
     this.loadData();
   },
 
-
   data () {
     return {
       relations: [],
@@ -153,6 +152,7 @@ h3.info
 td .color
   width 50px
   height 30px
+
 </style>
 
 
@@ -160,7 +160,7 @@ td .color
   .mdl-card.md-full-card.mh500
     Loader(:show='loading')
     .mdl-grid.w100
-      .mdl-cell.mdl-cell--10-col
+      .mdl-cell.mdl-cell--12-col
         mdl-button(@click='clickNew', v-mdl-ripple-effect, raised, primary)
           i.material-icons add
 
@@ -174,8 +174,11 @@ td .color
           i.material-icons refresh
 
         mdl-button.flat(@click='this.$dispatch("clickeditmodel")', v-mdl-ripple-effect)
-          i.material-icons visibility
+          i.material-icons view_list
 
+        mdl-button.flat(@click='this.$dispatch("clickeditmodel")', v-mdl-ripple-effect)
+          i.material-icons help
+        
     .mdl-cell.mdl-cell--12-col(v-if='gridRows.length > 0')
       mdl-button(v-mdl-ripple-effect, raised, v-for='r in relations') {{ r }}
       table.mdl-data-table.mdl-js-data-table.ml-table-striped.mdl-shadow--1dp

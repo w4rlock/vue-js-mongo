@@ -36,11 +36,15 @@ export default {
 <style lang='stylus'>
 .rowInput
   display inline-block
+
   .mdl-textfield
     width 120px
     margin-right 30px
+
+
   .docs
     width 270px
+    margin-right 0px
 
 </style>
 
