@@ -30,11 +30,13 @@ export default {
     },
 
     onDragStart(e){
+      e.currentTarget.classList.add('dragging');
       this.$data.dragged = e.currentTarget;
-      e.dataTransfer.effectAllowed = 'move';
     },
 
     onDragEnd(e){
+      e.currentTarget.classList.remove('dragging');
+      console.log(e.target);
       console.log(e.currentTarget);
     }
   }
@@ -54,6 +56,11 @@ export default {
   .docs
     width 270px
     margin-right 0px
+
+.dragging
+  opacity: 0.8
+  border 1px solid grey
+  border-style dashed
 
 </style>
 
