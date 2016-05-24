@@ -86,14 +86,14 @@ export default {
             this.model[o.jsonfield] = false;
           }
           else{
-            this.model[o.jsonfield] = null 
+            this.model[o.jsonfield] = null
           }
         });
       },
 
       clickTab(index, name){
         if (index > 0){
-          this.selectedrel.jsonfield = this.relations[index-1].jsonfield;
+          this.selectedrel.jsonfield = this.relations[index-1].type;
           this.selectedrel.viewname = this.relations[index-1].viewname;
           this.selectedrel.views = this.relations[index-1].views;
         }
@@ -116,7 +116,7 @@ export default {
       .mdl-cell.mdl-cell--6-col
         mdl-button(@click='clickCancel', v-mdl-ripple-effect, raised, primary)
           i.material-icons keyboard_arrow_left
-        mdl-button.flat(@click='clickSave', v-mdl-ripple-effect) 
+        mdl-button.flat(@click='clickSave', v-mdl-ripple-effect)
           i.material-icons cloud_upload
 
     .mdl-grid.w100
@@ -124,7 +124,7 @@ export default {
         .mdl-tabs.mdl-js-tabs.mdl-js-ripple-effect
           tab-bar(v-ref:tabbar, :names.sync='tabs', v-on:clicktab='clickTab', :cclass='"bar"')
 
-          .mdl-tabs__panel(:id='"panel-"+base.dbcollection', :class='{"mt90": (relations.length > 0), "is-active": this.$refs.tabbar.selectedTab == 0 }') 
+          .mdl-tabs__panel(:id='"panel-"+base.dbcollection', :class='{"mt90": (relations.length > 0), "is-active": this.$refs.tabbar.selectedTab == 0 }')
 
             h4.err(v-show='error') {{ error }}
             h5(v-if='model._id') {{ base.viewcollection }}: {{ model._id }}
@@ -132,14 +132,14 @@ export default {
 
             .frm
               div(v-for='k in keys')
-                div(v-if='k.type=="Boolean"') 
+                div(v-if='k.type=="Boolean"')
                   .mdl-textfield--floating-label.is-focused {{ k.viewname }}
                   mdl-switch(:checked.sync='model[k.jsonfield]', value='true')
 
                 div(v-else)
                   img.ico(v-if='isImage(model[k.name])', :src='model[k.jsonfield]')
 
-                  mdl-textfield(floating-label, 
+                  mdl-textfield(floating-label,
                     :class='{ "color": k.type == "Color" }',
                     :type.sync='k.type'
                     :label.sync='k.viewname',
@@ -147,10 +147,10 @@ export default {
 
           .mdl-tabs__panel.absolute(:class='{ "is-active": this.$refs.tabbar.selectedTab != 0 }')
             data-grid(v-ref:datagrid,
-              :showheads='false', 
-              :heads.sync='selectedrel.views', 
-              :checks='model[selectedrel.jsonfield] || []', 
-              :entity='selectedrel.jsonfield', 
+              :showheads='false',
+              :heads.sync='selectedrel.views',
+              :checks='model[selectedrel.jsonfield] || []',
+              :entity='selectedrel.jsonfield',
               :showidcol='false')
 
       .mdl-cell.mdl-cell--1-col.mdl-cell--1-col-tablet.ml50
@@ -198,5 +198,5 @@ export default {
   input
     width 50px
     height 50px
-  
+
 </style>
