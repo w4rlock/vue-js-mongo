@@ -29,7 +29,7 @@ export default {
         , jsonfield: ''
         , type: 'String'
         , isObject: false
-        , required: false 
+        , required: false
         , views: []
       },
       primateTypes: [
@@ -52,13 +52,13 @@ export default {
       this.error = null;
       this.loading = false;
       this.selectedRow = null,
-      this.model = { 
+      this.model = {
           dbcollection: null
         , viewcollection: null
         , attrs: [ clone(this.baseModel) ]
       }
     },
-    
+
     //edit mode
     open(bmodel){
       this.model = bmodel;
@@ -160,22 +160,22 @@ export default {
     .mdl-grid
       h4.err(v-show='error') {{ error }}
       .mdl-cell.mdl-cell--12-col.mdl-cell--12-col-tablet
-        h3(v-if='model._id') {{ model.viewcollection }} : {{ model.dbcollection }}
-        .rowInput(v-else)
-
+        .rowInput
           #txtCName.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label(
             v-bind:class="{ 'invalid': !model.viewcollection, 'is-dirty': model.viewcollection }")
             input.mdl-textfield__input(v-model='model.viewcollection')
             label.mdl-textfield__label Menu Name
 
           .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label(
-            v-bind:class="{ 'invalid': !model.dbcollection, 'is-dirty': model.dbcollection }")
+            v-enabled="!model._id", v-bind:class="{
+              'invalid': !model.dbcollection, 
+              'is-dirty': model.dbcollection }")
             input.mdl-textfield__input(v-model='model.dbcollection')
             label.mdl-textfield__label Entity Name
 
         row-key-type(
           :autoremove='true',
-          :attrs.sync='model.attrs', 
+          :attrs.sync='model.attrs',
           :basemodel='baseModel',
           v-on:clicktype='openType')
 

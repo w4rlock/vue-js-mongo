@@ -56,9 +56,9 @@ export default {
       let vals = [];
       for (let k in row){
         if (!this.hasChild(row[k])){
-          vals.push(row[k]);  
-        }  
-      } 
+          vals.push(row[k]);
+        }
+      }
       return vals;
     },
 
@@ -94,12 +94,12 @@ export default {
     clickDelete(){
       this.checks.forEach((i) => {
         let id = this.data[i]._id;
-        StoreCol.removeDocument(this.bmodel.dbcollection, id); 
+        StoreCol.removeDocument(this.bmodel.dbcollection, id);
       });
       setTimeout(() => { this.search(); }, 300);
     },
 
-  
+
     checkColor(index){
       if (index > 0){
         //$index-1 ya que no tengo el attrib _id en el modelo
@@ -176,9 +176,6 @@ td .color
         mdl-button.flat(@click='this.$dispatch("clickeditmodel")', v-mdl-ripple-effect)
           i.material-icons view_list
 
-        mdl-button.flat(@click='this.$dispatch("clickeditmodel")', v-mdl-ripple-effect)
-          i.material-icons help
-        
     .mdl-cell.mdl-cell--12-col(v-if='gridRows.length > 0')
       mdl-button(v-mdl-ripple-effect, raised, v-for='r in relations') {{ r }}
       table.mdl-data-table.mdl-js-data-table.ml-table-striped.mdl-shadow--1dp
