@@ -2,7 +2,7 @@
 import { clone } from '../utils/Utils'
 
 export default {
-  props: { 
+  props: {
     basemodel: { type: Object, required: true },
     attrs: { type: Array, required: true },
     autoremove: Boolean,
@@ -27,6 +27,15 @@ export default {
 
     upgradeComponents(){
       setTimeout(() => componentHandler.upgradeAllRegistered(), 200);
+    },
+
+    onDragStart(e){
+      this.$data.dragged = e.currentTarget;
+      e.dataTransfer.effectAllowed = 'move';
+    },
+
+    onDragEnd(e){
+      console.log(e.currentTarget);
     }
   }
 }
@@ -50,7 +59,7 @@ export default {
 
 <template lang='jade'>
 div(v-for='item in attrs', track-by="$index")
-  .rowInput
+  .rowInput(draggable, @dragstart='onDragStart', @dragend='onDragEnd')
     .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty(
       v-bind:class="{ 'invalid': !item.viewname,'is-dirty': item.viewname }")
       input.mdl-textfield__input(v-model='item.viewname')
@@ -67,7 +76,7 @@ div(v-for='item in attrs', track-by="$index")
       label.mdl-textfield__label Comment (docs)
 
     mdl-button.btnType(@click='clickType(this.$index, item)', v-mdl-ripple-effect) {{ item.type }}
-    mdl-button(v-if="this.$index > 0", @click='clickRemove(this.$index)', v-mdl-ripple-effect)
+    mdl-button(@click='clickRemove(this.$index)', v-mdl-ripple-effect)
       i.material-icons delete
 
 mdl-button(@click='clickAddNew', v-mdl-ripple-effect, fab)
