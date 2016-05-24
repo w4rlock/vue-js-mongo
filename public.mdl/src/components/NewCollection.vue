@@ -167,9 +167,8 @@ export default {
             label.mdl-textfield__label Menu Name
 
           .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label(
-            v-enabled="!model._id", v-bind:class="{
-              'invalid': !model.dbcollection, 
-              'is-dirty': model.dbcollection }")
+            :disabled="model._id!=undefined", 
+            v-bind:class="{'invalid': !model.dbcollection, 'is-dirty': model.dbcollection }")
             input.mdl-textfield__input(v-model='model.dbcollection')
             label.mdl-textfield__label Entity Name
 
