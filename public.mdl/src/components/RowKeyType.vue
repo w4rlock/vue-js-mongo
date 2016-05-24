@@ -59,7 +59,7 @@ export default {
 
 <template lang='jade'>
 div(v-for='item in attrs', track-by="$index")
-  .rowInput(draggable, @dragstart='onDragStart', @dragend='onDragEnd')
+  .rowInput(draggable='true', @dragstart='onDragStart', @dragend='onDragEnd')
     .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty(
       v-bind:class="{ 'invalid': !item.viewname,'is-dirty': item.viewname }")
       input.mdl-textfield__input(v-model='item.viewname')
