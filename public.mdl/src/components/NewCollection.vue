@@ -160,7 +160,7 @@ export default {
     .mdl-grid
       h4.err(v-show='error') {{ error }}
       .mdl-cell.mdl-cell--12-col.mdl-cell--12-col-tablet
-        .rowInput(draggable)
+        .rowInput
           #txtCName.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label(
             v-bind:class="{ 'invalid': !model.viewcollection, 'is-dirty': model.viewcollection }")
             input.mdl-textfield__input(v-model='model.viewcollection')
@@ -172,7 +172,6 @@ export default {
             label.mdl-textfield__label Entity Name
 
         row-key-type(
-          :mode
           :autoremove='true',
           :attrs.sync='model.attrs',
           :basemodel='baseModel',
