@@ -36,8 +36,8 @@ export default {
 
     onDragEnd(e){
       e.currentTarget.classList.remove('dragging');
-      console.log(e.target);
-      console.log(e.currentTarget);
+      console.log(e);
+      console.log(e);
     }
   }
 }
@@ -58,7 +58,7 @@ export default {
     margin-right 0px
 
 .dragging
-  opacity: 0.8
+  opacity: 0.95
   border 1px solid grey
   border-style dashed
 
@@ -66,7 +66,7 @@ export default {
 
 <template lang='jade'>
 div(v-for='item in attrs', track-by="$index")
-  .rowInput(draggable='true', @dragstart='onDragStart', @dragend='onDragEnd')
+  .rowInput(draggable='true', @dragstart='onDragStart', @dragleave='onDragEnd')
     .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label.is-dirty(
       v-bind:class="{ 'invalid': !item.viewname,'is-dirty': item.viewname }")
       input.mdl-textfield__input(v-model='item.viewname')
