@@ -166,7 +166,7 @@ export default {
             input.mdl-textfield__input(v-model='model.viewcollection')
             label.mdl-textfield__label Menu Name
 
-          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label(
+          #txtEntity.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label(
             v-bind:class="{'invalid': !model.dbcollection, 'is-dirty': model.dbcollection }")
             input.mdl-textfield__input(v-model='model.dbcollection', :disabled="model._id!=undefined")
             label.mdl-textfield__label Entity Name
@@ -202,6 +202,9 @@ export default {
   width 120px
   text-align left
 
+#txtEntity
+  text-transform lowercase
+  
 .popup
 	position: absolute;
 	background: white;

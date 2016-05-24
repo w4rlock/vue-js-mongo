@@ -93,7 +93,7 @@ export default {
 
       clickTab(index, name){
         if (index > 0){
-          this.selectedrel.jsonfield = this.relations[index-1].type;
+          this.selectedrel.jsonfield = this.relations[index-1].type.toLowerCase();
           this.selectedrel.viewname = this.relations[index-1].viewname;
           this.selectedrel.views = this.relations[index-1].views;
         }
