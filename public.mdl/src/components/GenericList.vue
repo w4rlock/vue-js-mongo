@@ -185,7 +185,9 @@ td .color
           tr
             th.mdl-data-table__cell--non-numeric
             th.mdl-data-table__cell--non-numeric _id
-            th.mdl-data-table__cell--non-numeric(v-for='attr in gridHeads') {{ attr.viewname }}
+            th.mdl-data-table__cell--non-numeric(v-for='attr in gridHeads', :id='attr._uid') {{ attr.viewname }}
+              .mdl-tooltip.mdl-tooltip--large(v-if='attr.comment', :for='attr._uid') {{ attr.comment }}
+
 
         tbody
           tr(v-for='row in data')
