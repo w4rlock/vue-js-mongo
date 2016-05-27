@@ -31,6 +31,7 @@ export default {
         , isObject: false
         , required: false
         , views: []
+        , _uid: ''
       },
       primateTypes: [
           'id'
@@ -55,7 +56,7 @@ export default {
       this.model = {
           dbcollection: null
         , viewcollection: null
-        , attrs: [ clone(this.baseModel) ]
+        , attrs: [ ]
       }
     },
 
@@ -80,6 +81,7 @@ export default {
 
     close(name_event){
       return () => {
+        this.$refs.rowattrs.reset();
         this.setDefaults();
         this.$dispatch(name_event);
       };
@@ -108,7 +110,9 @@ export default {
       this.error = null;
       this.loading = true;
       if (this.model._id){
-        StoreCol.updateDocument('model', this.model)
+        let changes = this.$refs.rowattrs.changes;
+        StoreCol.updateschema(this.model, changes)
+                .then(r => StoreCol.updateDocument('model', this.model))
                 .then(this.close('clickcancel'))
                 .catch(this.showErrorDB);
       }
@@ -175,6 +179,7 @@ export default {
           :autoremove='true',
           :attrs.sync='model.attrs',
           :basemodel='baseModel',
+          v-ref:rowattrs,
           v-on:clicktype='openType')
 
     .mdl-grid

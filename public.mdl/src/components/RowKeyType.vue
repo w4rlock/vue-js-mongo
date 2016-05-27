@@ -1,5 +1,5 @@
 <script>
-import { clone } from '../utils/Utils'
+import { clone, randomString } from '../utils/Utils'
 
 export default {
   props: {
@@ -28,7 +28,10 @@ export default {
     },
 
     clickAddNew(){
-      this.attrs.push(clone(this.basemodel));
+      let attr = clone(this.basemodel);
+      attr._uid = randomString(12) + String(new Date().valueOf());
+
+      this.attrs.push(attr);
       this.upgradeComponents();
     },
 
@@ -89,8 +92,8 @@ export default {
 .dragging
   opacity: 0.95
   background white
-  border 1px solid grey
-  border-style dashed
+  //border 1px solid grey
+  //border-style dashed
 
 </style>
 

@@ -18,7 +18,6 @@ export default {
     return {
       relations: [],
       gridKeys: [],
-      gridRows: [],
       gridHeads: [],
       notDataFound: false,
       data: {},
@@ -28,11 +27,10 @@ export default {
     };
   },
 
-
   methods: {
     setModel(c){
       this.bmodel = c;
-      this.gridHeads = filter(c.attrs,'isObject', false);
+      this.gridHeads = c.attrs;//filter(c.attrs,'isObject', false);
     },
 
 
@@ -42,9 +40,8 @@ export default {
       this.loading = true;
 
       Db.getDocuments(this.bmodel.dbcollection, p).then(r => {
-        this.data = r.data.data;
-        this.gridRows = r.data.data.map(this.rowMapMainEntity);
-        this.notDataFound = (this.gridRows.length == 0);
+        this.data = r.data.data || [];
+        this.notDataFound = (this.data.length == 0);
         this.loading = false;
 
         setTimeout(() => { componentHandler.upgradeAllRegistered() }, 100);
@@ -52,14 +49,19 @@ export default {
       });
     },
 
-    rowMapMainEntity(row){
-      let vals = [];
-      for (let k in row){
-        if (!this.hasChild(row[k])){
-          vals.push(row[k]);
-        }
+    // @param {Object} r is the currentRow for grid
+    // @param {Object} m is the model for grid
+    labelForType(r, m){
+      if (!r[m.jsonfield]){
+        return '';
       }
-      return vals;
+
+      if (!this.hasChild(r[m.jsonfield])){
+        return r[m.jsonfield];
+      }
+
+      let cant = (Array.isArray(r[m.jsonfield])) ? r[m.jsonfield].length : 0;
+      return `[ ${cant} ]`;
     },
 
     hasChild(field){
@@ -103,7 +105,7 @@ export default {
     checkColor(index){
       if (index > 0){
         //$index-1 ya que no tengo el attrib _id en el modelo
-        let attr = this.gridHeads[index-1];
+        let attr = this.gridHeads[index];
         return (attr && attr.type == "Color");
       }
       return false;
@@ -176,7 +178,7 @@ td .color
         mdl-button.flat(@click='this.$dispatch("clickeditmodel")', v-mdl-ripple-effect)
           i.material-icons view_list
 
-    .mdl-cell.mdl-cell--12-col(v-if='gridRows.length > 0')
+    .mdl-cell.mdl-cell--12-col(v-if='data.length > 0')
       mdl-button(v-mdl-ripple-effect, raised, v-for='r in relations') {{ r }}
       table.mdl-data-table.mdl-js-data-table.ml-table-striped.mdl-shadow--1dp
         thead
@@ -186,15 +188,18 @@ td .color
             th.mdl-data-table__cell--non-numeric(v-for='attr in gridHeads') {{ attr.viewname }}
 
         tbody
-          tr(v-for='row in gridRows')
+          tr(v-for='row in data')
             td
               mdl-checkbox(:value='$index', :checked.sync='checks')
 
-            td.mdl-data-table__cell--non-numeric(v-for='val in row', track-by='$index')
-              .color(v-if='checkColor(this.$index)', v-bind:style="{ background: val }")
+            td.mdl-data-table__cell--non-numeric
+                span(v-else){{ row['_id'] }}
+
+            td.mdl-data-table__cell--non-numeric(v-for='val in gridHeads', track-by='$index')
+              .color(v-if='checkColor(this.$index)', v-bind:style="{ background: row[val.jsonfield] }")
               div(v-else)
-                img.ico(v-if='checkImage(val)', v-bind:src='val')
-                span(v-else){{ val }}
+                img.ico(v-if='checkImage(row[val.jsonfield])', v-bind:src='row[val.jsonfield]')
+                span(v-else){{ labelForType(row, val) }}
 
     .mdl-cell.mdl-cell--12-col(v-if='notDataFound')
       h3.info Not Data Found

@@ -4,7 +4,7 @@ import StoreCol from '../stores/Collections'
 import TabBar from './TabBar'
 import DataGrid from './DataGrid'
 import Db from '../stores/Db'
-import { isImage, clone, filter } from '../utils/Utils'
+import { clone, filter } from '../utils/Utils'
 
 
 export default {
@@ -31,10 +31,9 @@ export default {
         model: {}
       , base: {}
       , keys: []
-      , selectedrel: { views: [], viewname: '', jsonfield: '' }
+      , selectedrel: { views: [], viewname: '', jsonfield: '', type: '' }
       , relations: []
       , error: null
-      , isImage: isImage
       , loading: false
       , tabs: []
       , showsearchinput: false
@@ -74,13 +73,19 @@ export default {
         else{
           this.initializeFormModel();
         }
+				this.checkRelationsNulls();
         this.upgradeComponents();
       },
 
+			checkRelationsNulls(){
+        this.relations.forEach((o) => {
+					if (!this.model[o.jsonfield]){
+						this.model[o.jsonfield] = [];
+					}
+				});
+			},
 
       initializeFormModel(){
-        this.relations.forEach((o) => this.model[o.jsonfield] = []);
-
         this.keys.forEach((o) => {
           if (o.type == 'Boolean'){
             this.model[o.jsonfield] = false;
@@ -93,9 +98,10 @@ export default {
 
       clickTab(index, name){
         if (index > 0){
-          this.selectedrel.jsonfield = this.relations[index-1].type.toLowerCase();
-          this.selectedrel.viewname = this.relations[index-1].viewname;
-          this.selectedrel.views = this.relations[index-1].views;
+          this.relations[index-1].type = this.relations[index-1].type.toLowerCase();
+          this.selectedrel = this.relations[index-1];
+
+	        this.$refs.datagrid.checks = this.model[this.selectedrel.jsonfield];
         }
 
         this.$refs.datagrid.show = (index > 0);
@@ -103,7 +109,12 @@ export default {
 
       upgradeComponents(){
         setTimeout(() => componentHandler.upgradeAllRegistered(), 500);
-      }
+      },
+
+			isImage(val){
+				if (!val || Array.isArray(val)) return false;
+				return val.match(/(.png|.jpg|.gif|jpeg|.svg)/i);
+			}
   }
 }
 </script>
@@ -137,7 +148,7 @@ export default {
                   mdl-switch(:checked.sync='model[k.jsonfield]', value='true')
 
                 div(v-else)
-                  img.ico(v-if='isImage(model[k.name])', :src='model[k.jsonfield]')
+                  img.ico(v-if='isImage(model[k.jsonfield])', :src='model[k.jsonfield]')
 
                   mdl-textfield(floating-label,
                     :class='{ "color": k.type == "Color" }',
@@ -150,7 +161,7 @@ export default {
               :showheads='false',
               :heads.sync='selectedrel.views',
               :checks='model[selectedrel.jsonfield] || []',
-              :entity='selectedrel.jsonfield',
+              :entity='selectedrel.type',
               :showidcol='false')
 
       .mdl-cell.mdl-cell--1-col.mdl-cell--1-col-tablet.ml50

@@ -49,7 +49,7 @@ export default {
         });
     },
 
-    /* Function: update json 
+    /* Function: update json
      *
      * @param {String} col collection name
      * @param {Object} data object to update
@@ -68,7 +68,18 @@ export default {
         });
     },
 
-    /* Function: remove json 
+
+    updateschema(model, changes){
+      return new Promise((res, rej) => {
+          let o = { model: model, changes: changes };
+          let url = `/Local/gamedb/updateschema`;
+
+          http.post(url, o, res, rej);
+      });
+
+    },
+
+    /* Function: remove json
      *
      * @param {String} col collection name
      * @param {Number} id object to remove

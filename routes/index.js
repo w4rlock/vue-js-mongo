@@ -1,6 +1,76 @@
+'use strict';
+
 var express = require('express');
+var _ = require('lodash');
+var async = require('async');
 var router = express.Router();
 var isModeApi = true;
+
+//emanuel
+router.post('/:conn/:db/updateschema', function (req, res, next) {
+  let dbname = req.params.db;
+  let conn = req.params.conn;
+
+  if (!conn){
+      res.status(500).json({ err: 'Invalid connection name' });
+      return;
+  }
+
+  if (!dbname){
+      res.status(500).json({ err: 'Invalid database name' });
+      return;
+  }
+
+  if (!req.body.model){
+      res.status(500).json({ err: 'param model is required'});
+      return;
+  }
+
+  let modelclient = req.body.model;
+  let changes = req.body.changes || [];
+  let realcollection = req.body.model.dbcollection;
+  let filter = { dbcollection: realcollection };
+
+  //remove fields from collection
+  var attrs_remove = changes.filter(c => c.action == 'remove')
+                            .map(a => a.obj.jsonfield);
+
+
+  dbconnect(req, conn, dbname).then(db => {
+      //models from db without changes
+      db.collection('model').find({ dbcollection: realcollection}).toArray((err, dbEntity) => {
+        if (dbEntity && dbEntity.length > 0){
+          dbEntity = dbEntity[0];
+        }
+
+        dbEntity = dbEntity || {};
+        dbEntity.attrs = dbEntity.attrs || [];
+
+        //client attrs compare with db attrs
+        let attrs_add = _.differenceBy(modelclient.attrs, dbEntity.attrs, '_uid') || [];
+        attrs_add = attrs_add.map(a => a.jsonfield);
+
+        let attrs_renamed = [];
+        //search for renamed jsonfield
+        dbEntity.attrs.forEach(a => {
+          var diff = modelclient.attrs.find(b => {
+            return (b._uid == a._uid && a.jsonfield != b.jsonfield);
+          });
+          if (diff){
+            attrs_renamed.push({ newname: diff.jsonfield, oldname: a.jsonfield });
+          }
+        })
+
+        removeAttrs(db, realcollection, attrs_remove)
+           .then(op => addAttrs(db, realcollection, attrs_add))
+           .then(op => renameAttrs(db, realcollection, attrs_renamed))
+           .then(op => res.json({ res: op }))
+           .catch(err => res.status(500).json({err: err}));
+      });
+  });
+
+
+});
 
 // the home route
 router.get('/', function (req, res, next) {
@@ -109,6 +179,8 @@ router.get('/:conn/:db/', function (req, res, next) {
     var conn_string = connection_list[req.params.conn].connection_string;
 
     // parse the connection string to get DB
+    conn_string+='/'+req.params.db;
+    console.log(conn_string);
     var uri = mongo_uri.parse(conn_string);
 
     // connect to DB
@@ -1011,7 +1083,7 @@ router.post('/api/:conn/:db/:coll/:page', function (req, res, next) {
     var mongodb = require('mongodb').MongoClient;
     var ejson = require('mongodb-extended-json');
     var docs_per_page = req.nconf.app.get('app:docs_per_page') != undefined ? req.nconf.app.get('app:docs_per_page') : 5;
-   
+
     // Check for existance of connection
     if(connection_list[req.params.conn] == undefined){
         res.writeHead(500, { 'Content-Type': 'application/text' });
@@ -1037,35 +1109,37 @@ router.post('/api/:conn/:db/:coll/:page', function (req, res, next) {
         if(req.params.page != undefined){
             page = parseInt(req.params.page);
         }
-         
+
         var skip = 0;
         if(page > 1){
             skip = (page - 1) * page_size
         }
 
         var limit = page_size;
-        
+
         var query_obj = {};
-        if(req.body.query){     
+        if(req.body.query){
             try {
                 query_obj = ejson.parse(req.body.query);
             }catch (e) {
                 query_obj = {}
             }
         }
-        
+
         db.collection(req.params.coll).find(query_obj).limit(limit).skip(skip, function (err, result) {
             if (err) {
                 res.status(500).json(err);
             }else{
-                
+
                 db.collection(req.params.coll).find({}).limit(limit).skip(skip, function (err, simpleSearchFields) {
-                    //get field names/keys of the Documents in collection                
+                    //get field names/keys of the Documents in collection
                     var fields = [];
                     for (var i = 0; i < simpleSearchFields.length; i++) {
                         var doc = simpleSearchFields[i];
 
-                        for (key in doc){
+                        if (!doc || Object.keys(doc).length < 1) continue;
+
+                        for (var key in doc){
                            if(key == "__v") continue;
                            fields.push(key);
                         }
@@ -1074,7 +1148,7 @@ router.post('/api/:conn/:db/:coll/:page', function (req, res, next) {
                     fields = fields.filter(function(item, pos) {
                         return fields.indexOf(item) == pos;
                     });
-                    
+
                     // get total num docs in query
                     db.collection(req.params.coll).count(query_obj, function (err, doc_count) {
                         var return_data = {
@@ -1085,8 +1159,8 @@ router.post('/api/:conn/:db/:coll/:page', function (req, res, next) {
                         res.status(200).json(return_data);
                     });
 
-                });                
-            }            
+                });
+            }
         });
     });
 });
@@ -1365,6 +1439,160 @@ function clean_stats(array){
         i++;
     }
     return accum;
+}
+
+
+function removeAttrs(db, collection, fields = []){
+  return new Promise((res, rej) => {
+
+    if (!fields || fields.length < 1){
+      res('ok');
+      return;
+    }
+
+    async.each(fields, (f, callback) => {
+      var field = {};
+      field[f] = 1;
+
+      console.log('Removing attrs: %s on %s', JSON.stringify(field), collection);
+      db.command({
+          update: collection,
+          updates: [
+            { q: {},
+              u: { $unset: field},
+              multi: true
+            }
+          ]
+      }, (err, ob) => {
+        if (err){
+           console.log('Error on removeAttrs ', err);
+           callback(err);
+
+        }
+        else {
+          console.log('Mongo Response on removeAttrs ', ob);
+          callback();
+        }
+      });
+
+    },
+    (err) => {
+        if (err) rej(err)
+        else res('ok');
+    });
+  });
+}
+
+
+function addAttrs(db, collection, fields = []){
+  return new Promise((res, rej) => {
+
+    if (!fields || fields.length < 1){
+      res('ok');
+      return;
+    }
+
+    async.each(fields, (f, callback) => {
+      var field = {};
+      field[f] = null;
+
+      console.log('Adding attr: %s on %s', JSON.stringify(field), collection);
+      db.command({
+          update: collection,
+          updates: [
+            { q: {},
+              u: { '$set': field},
+              multi: true
+            }
+          ]
+      }, (err, ob) => {
+        if (err){
+           console.log('Error on addingAttrs ', err);
+           callback(err);
+
+        }
+        else {
+          console.log('Mongo Response on addingAttrs ', ob);
+          callback();
+        }
+      });
+
+    },
+    (err) => {
+        if (err) rej(err)
+        else res('ok');
+    });
+  });
+}
+
+function renameAttrs(db, collection, fields = []){
+  return new Promise((res, rej) => {
+
+    if (!fields || fields.length < 1){
+      res('ok');
+      return;
+    }
+
+    async.each(fields, (f, callback) => {
+      var field = {};
+      field[f.oldname] = f.newname;
+
+      console.log('Renaming attr: %s on %s', JSON.stringify(field), collection);
+      db.command({
+          update: collection,
+          updates: [
+            { q: {},
+              u: { '$rename': field},
+              multi: true
+            }
+          ]
+      }, (err, ob) => {
+        if (err){
+           console.log('Error on rename attrs ', err);
+           callback(err);
+
+        }
+        else {
+          console.log('Mongo Response on renamingAttrs ', ob);
+          callback();
+        }
+      });
+
+    },
+    (err) => {
+        if (err) rej(err)
+        else res('ok');
+    });
+  });
+}
+
+
+/*
+* @param {Object} req request
+* @param {String} conn config (Local, remote etc)
+* @param {String} db_name database name
+*
+*/
+function dbconnect(req, conn, db_name){
+  return new Promise((res, rej) => {
+    var mongojs = require('mongojs');
+    var connection_list = req.nconf.connections.get('connections');
+    var mongodb = require('mongodb').MongoClient;
+    var mongo_uri = require('mongo-uri');
+    var conn_string = connection_list[conn].connection_string;
+    // parse the connection string to get DB
+    var uri = mongo_uri.parse(conn_string);
+    // If there is a DB in the connection string, we redirect to the DB level
+    // connect to DB
+    mongodb.connect(conn_string, function (err, mongo_db) {
+      if (err) rej(err);
+      else{
+        var db = mongo_db.db(db_name);
+        res(db);
+      }
+    });
+
+  });
 }
 
 module.exports = router;
